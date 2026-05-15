@@ -102,3 +102,27 @@ func TestWriteQuotesCSV(t *testing.T) {
 		t.Fatalf("expected 2 lines, got %d", len(lines))
 	}
 }
+
+func TestWriteQuoteNDJSON(t *testing.T) {
+	var buf bytes.Buffer
+	q := domain.Quote{
+		ProductCode: "US20100311002",
+		Symbol:      "SOXL",
+		Last:        167.10,
+		Volume:      1500000,
+	}
+	if err := WriteQuoteNDJSON(&buf, q); err != nil {
+		t.Fatalf("error: %v", err)
+	}
+	line := strings.TrimRight(buf.String(), "\n")
+	if strings.Contains(line, "\n") {
+		t.Fatalf("expected single line, got %q", buf.String())
+	}
+	var parsed domain.Quote
+	if err := json.Unmarshal([]byte(line), &parsed); err != nil {
+		t.Fatalf("not valid JSON: %v", err)
+	}
+	if parsed.Symbol != "SOXL" {
+		t.Fatalf("unexpected quote: %+v", parsed)
+	}
+}
