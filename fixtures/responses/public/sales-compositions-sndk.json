@@ -1,0 +1,13 @@
+{
+  "result": {
+    "code": "NAS116LTR-E0",
+    "fiscalYear": 2025,
+    "endDate": "2025-06-30",
+    "compositions": [
+      {"business": "클라이언트", "jpBusiness": null, "product": null, "ratio": 56.11},
+      {"business": "소비자", "jpBusiness": null, "product": null, "ratio": 30.84},
+      {"business": "클라우드 서비스", "jpBusiness": null, "product": null, "ratio": 13.05}
+    ],
+    "dataSource": "출처: 연합인포맥스 및 기업 IR자료"
+  }
+}

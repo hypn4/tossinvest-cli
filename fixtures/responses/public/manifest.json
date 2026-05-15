@@ -119,6 +119,11 @@
       "file": "stock-valuation-sndk.json",
       "url": "(combined evaluation+comparison fixture for testing only)",
       "method": "POST"
+    },
+    {
+      "file": "sales-compositions-sndk.json",
+      "url": "https://wts-info-api.tossinvest.com/api/v1/companies/NAS116LTR-E0/sales-compositions",
+      "method": "GET"
     }
   ]
 }

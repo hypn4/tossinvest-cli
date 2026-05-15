@@ -524,3 +524,21 @@ type PeerValuation struct {
 	Period      string  `json:"period"`
 	IsSelf      bool    `json:"isSelf"`
 }
+
+// SalesComposition is the revenue breakdown by business segment returned by
+// /api/v1/companies/{companyCode}/sales-compositions.
+type SalesComposition struct {
+	ProductCode string                 `json:"productCode"`
+	CompanyCode string                 `json:"companyCode"`
+	FiscalYear  int                    `json:"fiscalYear"`
+	EndDate     string                 `json:"endDate"`
+	Items       []SalesCompositionItem `json:"items"`
+	DataSource  string                 `json:"dataSource"`
+	FetchedAt   time.Time              `json:"fetchedAt"`
+}
+
+type SalesCompositionItem struct {
+	Business string  `json:"business"`
+	Product  string  `json:"product,omitempty"`
+	Ratio    float64 `json:"ratio"`
+}

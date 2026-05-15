@@ -122,6 +122,32 @@ Examples:
 		},
 	}
 
-	cmd.AddCommand(infoCmd, overviewCmd, indicatorsCmd, valuationCmd)
+	revenueCmd := &cobra.Command{
+		Use:   "revenue <symbol>",
+		Short: "Revenue composition by business segment (latest fiscal period)",
+		Long: `Fetch revenue composition from
+/api/v1/companies/{companyCode}/sales-compositions.
+
+The companyCode (e.g. NAS116LTR-E0) is resolved internally via the
+company-overview call.
+
+Examples:
+  tossctl stock revenue SNDK
+  tossctl stock revenue NAS0250224006 --output json`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			app, err := newAppContext(opts)
+			if err != nil {
+				return err
+			}
+			sc, err := app.client.GetSalesComposition(cmd.Context(), args[0])
+			if err != nil {
+				return userFacingCommandError(err)
+			}
+			return output.WriteSalesComposition(cmd.OutOrStdout(), app.format, sc)
+		},
+	}
+
+	cmd.AddCommand(infoCmd, overviewCmd, indicatorsCmd, valuationCmd, revenueCmd)
 	return cmd
 }
