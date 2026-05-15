@@ -105,24 +105,24 @@ func TestWriteQuotesCSV(t *testing.T) {
 
 func TestWriteQuoteNDJSON(t *testing.T) {
 	var buf bytes.Buffer
-	q := domain.Quote{
-		ProductCode: "US20100311002",
-		Symbol:      "SOXL",
-		Last:        167.10,
-		Volume:      1500000,
+	quotes := []domain.Quote{
+		{ProductCode: "US20100311002", Symbol: "SOXL", Last: 167.10, Volume: 1500000},
+		{ProductCode: "US594918104", Symbol: "MSFT", Last: 410.50, Volume: 22000000},
 	}
-	if err := WriteQuoteNDJSON(&buf, q); err != nil {
-		t.Fatalf("error: %v", err)
+	for _, q := range quotes {
+		if err := WriteQuoteNDJSON(&buf, q); err != nil {
+			t.Fatalf("error: %v", err)
+		}
 	}
-	line := strings.TrimRight(buf.String(), "\n")
-	if strings.Contains(line, "\n") {
-		t.Fatalf("expected single line, got %q", buf.String())
+	lines := strings.Split(strings.TrimRight(buf.String(), "\n"), "\n")
+	if len(lines) != 2 {
+		t.Fatalf("expected 2 NDJSON lines, got %d: %q", len(lines), buf.String())
 	}
-	var parsed domain.Quote
-	if err := json.Unmarshal([]byte(line), &parsed); err != nil {
-		t.Fatalf("not valid JSON: %v", err)
+	var first domain.Quote
+	if err := json.Unmarshal([]byte(lines[0]), &first); err != nil {
+		t.Fatalf("first line not valid JSON: %v", err)
 	}
-	if parsed.Symbol != "SOXL" {
-		t.Fatalf("unexpected quote: %+v", parsed)
+	if first.Symbol != "SOXL" {
+		t.Fatalf("unexpected first quote: %+v", first)
 	}
 }
