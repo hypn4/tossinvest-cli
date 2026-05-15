@@ -1,0 +1,74 @@
+{
+  "result": {
+    "terms": {"personalizedServiceAgreed": true, "serviceAgreed": true},
+    "createdAt": "2026-05-15T11:54:26Z",
+    "signalId": "STOCKS:NAS0FR6ZB-E0:20260515",
+    "signalDirection": 1,
+    "reasoning": {
+      "description": "실적 개선 효과",
+      "issue": {
+        "assetName": "슈퍼 리그 엔터프라이즈",
+        "assetType": "STOCKS",
+        "assetCode": "NAS0FR6ZB-E0",
+        "profitLossRate": 0.4054,
+        "description": {
+          "data": [
+            "슈퍼 리그 엔터프라이즈는 1분기 매출이 전년 대비 10.49% 증가하고, 총마진이 36%로 개선됐어요.",
+            "Misfits Ads Business 인수 효과로 수익성 높은 프로그래매틱 매출이 추가되고, 브랜드 파트너십 확대와 멀티 플랫폼 프로그램이 운영 모멘텀에 기여했어요.",
+            "애널리스트들은 실적 개선과 인수 효과를 반영해 '매수' 의견을 제시하고 있으며, 슈퍼 리그 엔터프라이즈는 혁신적 엔터테인먼트 플랫폼과 미디어·광고 사업을 주력으로 하고 있어요."
+          ]
+        },
+        "investmentType": "RECOMMEND",
+        "originCodes": ["US20190226001"]
+      },
+      "news": {
+        "data": [
+          {
+            "id": "benzinga_52592661",
+            "source": "benzinga",
+            "agencyName": "벤징가",
+            "title": "슈퍼리그 엔터프라이즈, 1분기 실적 전망치 상회…조정 EPS·매출 모두 기대치 초과",
+            "createdAt": "2026-05-15T11:50:38Z"
+          },
+          {
+            "id": "reuter_L1N41S0HK",
+            "source": "reuter",
+            "agencyName": "로이터",
+            "title": "슈퍼리그 엔터프라이즈, 1분기 매출 증가·수익성 개선",
+            "createdAt": "2026-05-15T11:41:52Z"
+          }
+        ]
+      },
+      "keywords": ["실적 개선", "매출 증가", "인수 효과"]
+    },
+    "relatedReasoning": {
+      "details": [
+        {
+          "signalId": "STOCKS:NAS0FR6ZB-E0:20260515",
+          "assetCode": "NYS0PPLTF-E0",
+          "assetName": "피스클노트 홀딩스",
+          "relatedStocks": [
+            {
+              "stockCode": "US20220801005",
+              "stockName": "피스클노트 홀딩스",
+              "symbol": "NOTE"
+            }
+          ],
+          "description": {
+            "data": [
+              "슈퍼 리그 엔터프라이즈와 피스클노트 홀딩스 두 기업 모두 광고 산업군에 속해 있어요.",
+              "광고 산업군 내에서, 피스클노트 홀딩스는 최근에 높은 거래대금을 기록하고 있어요.",
+              "피스클노트 홀딩스는 인공지능과 기계학습 기술을 활용해 데이터 분석, 워크플로우 도구, 전문가 리서치 서비스를 구독 형태로 제공하는 IT 기업이에요."
+            ]
+          },
+          "relationship": {
+            "subjectName": "슈퍼 리그 엔터프라이즈",
+            "relation": "같은산업",
+            "objectName": "피스클노트 홀딩스"
+          }
+        }
+      ]
+    },
+    "hasRelatedReasoning": true
+  }
+}
