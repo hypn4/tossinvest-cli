@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
 - `tossctl options expiries <underlying>` — list option expiry ladder via `/api/v1/option-maturity-date/get-all`.
 - `tossctl options chain <underlying> [--expiry] [--type call|put] [--with-prices]` — strike chain (call + put per strike) via `/api/v1/option-both-chain/get-all`; optional bulk-price join.
 - `tossctl options prices <codes>` — bulk option/stock prices via `/api/v2/stock-prices?codes=…` (lighter than `quote get`).
+- `tossctl stock overview <symbol>` — company overview card (CEO, Enterprise Value KRW/USD, industry, description, listing, shares outstanding, homepage) via `/api/v2/stock-infos/{code}/overview`. Closes the EV + CEO gap previously documented in `stock-info-deep-tab.md`.
 
 ### Changed
 - `cmd/tossctl/chart.go`, `cmd/tossctl/quotes.go`, `cmd/tossctl/quote.go` long help text now documents that `--follow` is REST polling (no SSE/WebSocket from Toss) and that closed-market silence is correct behavior.
