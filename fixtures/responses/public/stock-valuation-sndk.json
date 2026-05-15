@@ -1,0 +1,31 @@
+{
+  "evaluation": {
+    "result": {
+      "per": 45.4,
+      "pbr": 14.9,
+      "psr": 15.5,
+      "median": 26.52350207310445,
+      "position": "HIGH"
+    }
+  },
+  "comparison": {
+    "result": {
+      "selectedFactor": {"code": "PER", "displayName": "PER"},
+      "selectedTics": {"code": 209, "displayName": "컴퓨터와 주변기기"},
+      "ticsStocks": [
+        {"code": "US19990122001", "name": "엔비디아", "isDefault": false},
+        {"code": "US19801212001", "name": "애플", "isDefault": false},
+        {"code": "US19890516001", "name": "마이크론 테크놀로지", "isDefault": false},
+        {"code": "NAS0250224006", "name": "샌디스크", "isDefault": true},
+        {"code": "US20021211002", "name": "씨게이트", "isDefault": false}
+      ],
+      "stockGraphs": [
+        {"code": "US19990122001", "name": "엔비디아", "graph": [{"period": "26년 1분기", "value": 47.55}]},
+        {"code": "US19801212001", "name": "애플", "graph": [{"period": "26년 1분기", "value": 35.73}]},
+        {"code": "US19890516001", "name": "마이크론 테크놀로지", "graph": [{"period": "26년 1분기", "value": 36.30}]},
+        {"code": "NAS0250224006", "name": "샌디스크", "graph": [{"period": "26년 1분기", "value": 45.4}]},
+        {"code": "US20021211002", "name": "씨게이트", "graph": [{"period": "26년 1분기", "value": 22.1}]}
+      ]
+    }
+  }
+}

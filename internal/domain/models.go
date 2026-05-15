@@ -499,3 +499,28 @@ type StockIndicators struct {
 
 // IndicatorFields holds the raw per-section payload as decoded JSON.
 type IndicatorFields map[string]any
+
+// StockValuation aggregates the per-stock valuation snapshot (evaluation) and
+// peer comparison matrix (evaluation-comparison).
+type StockValuation struct {
+	ProductCode string          `json:"productCode"`
+	PER         float64         `json:"per"`
+	PBR         float64         `json:"pbr"`
+	PSR         float64         `json:"psr"`
+	Median      float64         `json:"median"`        // industry median for SelectedFactor
+	Position    string          `json:"position"`      // HIGH|LOW|NORMAL
+	Factor      string          `json:"factor"`        // PER (default), PBR, PSR, …
+	Industry    string          `json:"industry"`      // selectedTics displayName
+	Peers       []PeerValuation `json:"peers"`
+	FetchedAt   time.Time       `json:"fetchedAt"`
+}
+
+// PeerValuation is one row in the peer comparison table. `Value` is the most
+// recent graph point for the selected factor.
+type PeerValuation struct {
+	ProductCode string  `json:"productCode"`
+	Name        string  `json:"name"`
+	Value       float64 `json:"value"`
+	Period      string  `json:"period"`
+	IsSelf      bool    `json:"isSelf"`
+}

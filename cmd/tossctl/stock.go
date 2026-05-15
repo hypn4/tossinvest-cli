@@ -94,6 +94,34 @@ Examples:
 		},
 	}
 
-	cmd.AddCommand(infoCmd, overviewCmd, indicatorsCmd)
+	valuationCmd := &cobra.Command{
+		Use:   "valuation <symbol>",
+		Short: "Per-stock PER/PBR/PSR vs industry median + peer table",
+		Long: `Fetch the valuation snapshot and peer comparison from
+/api/v2/stock-infos/evaluation/{code} and
+/api/v2/stock-infos/evaluation-comparison/{code} (both POST {}).
+
+Output shows PER/PBR/PSR plus the industry median and HIGH/LOW/NORMAL
+position label, followed by the peer table (5 stocks) for the
+selected factor.
+
+Examples:
+  tossctl stock valuation SNDK
+  tossctl stock valuation NAS0250224006 --output json`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			app, err := newAppContext(opts)
+			if err != nil {
+				return err
+			}
+			val, err := app.client.GetStockValuation(cmd.Context(), args[0])
+			if err != nil {
+				return userFacingCommandError(err)
+			}
+			return output.WriteStockValuation(cmd.OutOrStdout(), app.format, val)
+		},
+	}
+
+	cmd.AddCommand(infoCmd, overviewCmd, indicatorsCmd, valuationCmd)
 	return cmd
 }
