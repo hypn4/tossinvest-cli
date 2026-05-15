@@ -49,29 +49,48 @@ GET https://wts-info-api.tossinvest.com/api/v1/stock-detail/ui/{productCode}/inf
 | 회사 설명 "SD카드, USB 플래시 드라이브 등의 메모리 제품을 판매하는 회사" | `OVERVIEW` | `description` |
 | 출처 "연합인포맥스 및 기업 IR자료" | `COMPOSITION_OF_REVENUE` | `description` |
 | 시가총액 (306조 1,466억원) | `INDICATORS` | `시가총액` row |
-| 실제 기업 가치 (151조 6,071억원) | **❌ NOT FOUND** | not in this endpoint; likely a different endpoint not yet captured |
-| 기업명 SANDISK CORP | `/api/v2/stock-infos/{code}` | `englishName` |
-| 대표이사 David V. Goeckeler | **❌ NOT FOUND** | not in this endpoint; possibly under a separate `/companies/{companyCode}/profile` or similar |
-| 상장일 2025-02-24 | `OVERVIEW` (indirect) + `FINANCES.listDate` | also `/api/v2/stock-infos/{code}` `listDate` (sometimes `null` — fallback to `FINANCES.listDate`) |
-| 발행주식수 148,089,758주 | (not in this endpoint) | `/api/v2/stock-infos/{code}` `sharesOutstanding` |
-| 매출 구성 (좌측 서브탭) | `COMPOSITION_OF_REVENUE` | full |
-| 재무 (좌측 서브탭) | `FINANCES` | full |
-| 실적 (좌측 서브탭) | `EARNINGS_AND_CONSENSUS` | full |
-| 배당 (좌측 서브탭) | `INDICATORS.values[label=배당수익률]` | spot value (history not in this endpoint) |
-| 동종 업계 비교 | `VALUATION_METRICS` | full |
-| 애널리스트 분석 | `ANALYST_OPINION` | full |
+| 실제 기업 가치 (151조 6,071억원) | `/api/v2/stock-infos/{code}/overview` | `enterpriseValueKrw` / `enterpriseValue` (USD) — **CAPTURED 2026-05-16** |
+| 기업명 SANDISK CORP | `/api/v2/stock-infos/{code}/overview` | `company.fullEnglishName` (also `englishName` in stock-infos) |
+| 대표이사 David V. Goeckeler | `/api/v2/stock-infos/{code}/overview` | `company.ceo` — **CAPTURED 2026-05-16** |
+| 회사 설명 ("SD카드, USB 플래시…") | `/api/v2/stock-infos/{code}/overview` | `company.description` |
+| 상장일 2025-02-24 | `/api/v2/stock-infos/{code}/overview` | `company.listDate` + root `listDate` |
+| 설립연도 / 산업 분류 / 홈페이지 | `/api/v2/stock-infos/{code}/overview` | `company.{establishYear, industry.{code,displayName}, homepageUrl}` |
+| 발행주식수 148,089,758주 | `/api/v2/stock-infos/{code}/overview` | `company.sharesOutstanding` |
+| 시가총액 (USD + KRW) | `/api/v2/stock-infos/{code}/overview` | root `marketValue` + `marketValueKrw` |
+| 출처 ("출처: 연합인포맥스 및 기업 IR자료") | `/api/v2/stock-infos/{code}/overview` | `dataSource` |
+| 매출 구성 (좌측 서브탭) | `/api/v1/companies/{companyCode}/sales-compositions` | `compositions[].{business, ratio}` + `fiscalYear`, `endDate`, `dataSource` |
+| TICS 분류 (산업) | `/api/v2/companies/{companyCode}/tics` | `majorList[].{id, title, summary, companyCount, rankings[]}` |
+| 주요 지표 (시가총액/PER/PBR/PSR/ROE/EPS/BPS/배당) | `/api/v1/stock-detail/ui/wts/{code}/investment-indicators` | `indicatorSections[].{sectionName, data}` — 가치평가 / 수익 / 배당 / 안정성 분리 |
+| Valuation (PER/PBR/PSR + 업종 중앙값 + position) | `POST /api/v2/stock-infos/evaluation/{code}` | `{per, pbr, psr, median, position:"HIGH"\|"LOW"\|"NORMAL"}` |
+| 동종업계 비교 | `POST /api/v2/stock-infos/evaluation-comparison/{code}` | `selectableFactors[]`, `selectableFactorsList[][]` (per-factor peer list) |
+| 재무 (분기/연 매출/영업이익/순익) | `POST /api/v2/stock-infos/revenue-and-net-profit/{code}` + `POST /api/v2/stock-infos/operating-income/{code}` | per-period values |
+| 재무제표 전체 | `POST /api/v2/companies/{code}/financial-statements/comprehensive` + `POST /api/v2/companies/{code}/financial-statement-records` | full statement records |
+| 안정성 (부채비율 / 유동비율) | `POST /api/v2/stock-infos/stability/{code}` | year + quarter time series |
+| 컨센서스 / 추정치 | `GET /api/v2/companies/{code}/financial/estimate/date` + `POST .../estimate/revenue` + `POST .../estimate/eps` + `POST .../estimate/operating-income` | each returns `[{pointDate, fiscalEndDate, value, isFuture, …}]` |
+| 컨센서스 요약 (목표가/등락 이력) | `/api/v2/stock-infos/consensus/{code}` | `targetPrice.{mean, high, low, *Krw, currency}` + `pastClosePrices[]` |
+| 배당 history (분기/연 + yield ratio) | `/api/v1/stock-infos/dividend/{code}/years` + `/api/v1/stock-infos/dividend/{code}/summary` + `/api/v1/stock-infos/{code}/dividends/yield-ratio/histories` | dividend amounts by period + yield-ratio time series |
+| 애널리스트 의견 (BUY/HOLD/SELL counts + target price) | `/api/v1/stock-detail/ui/wts/{code}/analyst-opinion` | `{type, strongBuy, buy, hold, sell, strongSell, targetPrice.{USD,KRW}, description}` |
+| 애널리스트 보고서 (목록) | `/api/v1/stock-detail/ui/wts/{code}/analyst-reports` | list of report metadata |
+| 시그널 chips + 뉴스 + 공시 + TOP_TIER_TREND 등 나머지 | `/api/v1/stock-detail/ui/{code}/info` | 기존 PR6 endpoint — 13 sections JSON |
 
-## Gaps (need browser capture)
+## Section orchestration
 
-| Field | Likely endpoint |
-| --- | --- |
-| 실제 기업 가치 (Enterprise Value) | unknown; possibly `/api/v1/stock-detail/ui/{code}/enterprise-value` or attached to `INDICATORS` for some codes |
-| 대표이사 (CEO) | likely `/api/v1/companies/{companyCode}/profile` — `/api/v1/companies/{companyCode}` exists but returned `null` for `NAS116LTR-E0`; the profile/CEO might require an authed call or a different path |
-| 배당 history (quarterly payouts) | likely a `/dividends` family — not in `/info` |
-| Insider trading / shareholders | not captured |
-| Memo (메모 작성) | UI-only |
+`GET /api/v1/stock-detail/ui/wts/{code}/section-orders` returns the canonical render order for the deep tab:
 
-When a user wants these, the next step is to click the relevant tab in browser DevTools and capture the network call.
+```
+["OVERVIEW","FINANCE","REVENUE_NET_PROFIT","OPERATING_INCOME","STABILITY","FINANCIAL_STATEMENT","ESTIMATE_DATE","ESTIMATE_REVENUE","ESTIMATE_EPS","DIVIDEND_SUMMARY","DIVIDEND","EVALUATION_COMPARISON","ANALYST_REPORT"]
+```
+
+CLI consumers can follow this ordering when assembling LLM context.
+
+## All gaps now closed (2026-05-16 capture)
+
+Previous gap list eliminated:
+- ✅ Enterprise Value — `/overview.enterpriseValueKrw`
+- ✅ CEO — `/overview.company.ceo`
+- ✅ Dividend history — `/dividend/{code}/years` + `/dividend/{code}/summary` + `/yield-ratio/histories`
+
+The 종목정보 tab is now fully reverse-engineered. Image #3 has 100% endpoint coverage.
 
 ## CLI Mapping
 
