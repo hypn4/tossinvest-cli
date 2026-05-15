@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 
+	"github.com/junghoonkye/tossinvest-cli/internal/domain"
 	"github.com/junghoonkye/tossinvest-cli/internal/output"
 )
 
@@ -66,6 +68,130 @@ chain enumeration endpoint has not yet been reverse-engineered.`,
 		},
 	}
 
-	cmd.AddCommand(infoCmd, atmCmd)
+	expiriesCmd := &cobra.Command{
+		Use:   "expiries <underlying>",
+		Short: "List the option expiry ladder for an underlying",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			app, err := newAppContext(opts)
+			if err != nil {
+				return err
+			}
+			exps, err := app.client.ListOptionExpiries(cmd.Context(), args[0])
+			if err != nil {
+				return userFacingCommandError(err)
+			}
+			return output.WriteOptionExpiries(cmd.OutOrStdout(), app.format, exps)
+		},
+	}
+
+	var (
+		chainExpiry     string
+		chainType       string
+		chainWithPrices bool
+	)
+	chainCmd := &cobra.Command{
+		Use:   "chain <underlying>",
+		Short: "Show the strike chain (call + put per strike) for an expiry",
+		Long: `Show the strike chain for an underlying's expiry.
+
+If --expiry is omitted, the nearest expiry from the expiry ladder is used.
+
+Use --with-prices to join in bulk option prices (one extra round-trip; ~58
+codes per call). --type call|put filters the rows client-side.`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			app, err := newAppContext(opts)
+			if err != nil {
+				return err
+			}
+			expiry := chainExpiry
+			if expiry == "" {
+				exps, err := app.client.ListOptionExpiries(cmd.Context(), args[0])
+				if err != nil {
+					return userFacingCommandError(err)
+				}
+				if len(exps) == 0 {
+					return fmt.Errorf("no expiries available for %s", args[0])
+				}
+				expiry = exps[0].MaturityDate
+			}
+			rows, err := app.client.GetOptionChain(cmd.Context(), args[0], expiry)
+			if err != nil {
+				return userFacingCommandError(err)
+			}
+			if chainWithPrices {
+				codes := make([]string, 0, len(rows)*2)
+				for _, r := range rows {
+					if r.CallGuid != "" {
+						codes = append(codes, r.CallGuid)
+					}
+					if r.PutGuid != "" {
+						codes = append(codes, r.PutGuid)
+					}
+				}
+				prices, err := app.client.GetOptionPrices(cmd.Context(), codes)
+				if err != nil {
+					return userFacingCommandError(err)
+				}
+				priceByCode := make(map[string]*domain.OptionPrice, len(prices))
+				for i := range prices {
+					priceByCode[prices[i].Code] = &prices[i]
+				}
+				for i := range rows {
+					if p, ok := priceByCode[rows[i].CallGuid]; ok {
+						rows[i].CallPrice = p
+					}
+					if p, ok := priceByCode[rows[i].PutGuid]; ok {
+						rows[i].PutPrice = p
+					}
+				}
+			}
+			switch strings.ToLower(chainType) {
+			case "", "both":
+			case "call":
+				for i := range rows {
+					rows[i].PutGuid = ""
+					rows[i].PutPrice = nil
+					rows[i].PutOpenInterest = 0
+				}
+			case "put":
+				for i := range rows {
+					rows[i].CallGuid = ""
+					rows[i].CallPrice = nil
+					rows[i].CallOpenInterest = 0
+				}
+			default:
+				return fmt.Errorf("--type must be call/put/both (got %q)", chainType)
+			}
+			return output.WriteOptionChain(cmd.OutOrStdout(), app.format, rows)
+		},
+	}
+	chainCmd.Flags().StringVar(&chainExpiry, "expiry", "", "Expiry date YYYY-MM-DD (default: nearest)")
+	chainCmd.Flags().StringVar(&chainType, "type", "both", "Filter: call / put / both")
+	chainCmd.Flags().BoolVar(&chainWithPrices, "with-prices", false, "Join bulk prices into the chain rows (extra round-trip)")
+
+	pricesCmd := &cobra.Command{
+		Use:   "prices <code> [<code>...]",
+		Short: "Bulk option/stock prices (lighter than quote get)",
+		Long: `Fetch a flat price list for one or many productCodes (typically OPT_ codes).
+
+Example:
+  tossctl options prices OPT_SNDK260515C01395000_20260506 OPT_SNDK260515P01395000_20260506`,
+		Args: cobra.MinimumNArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			app, err := newAppContext(opts)
+			if err != nil {
+				return err
+			}
+			prices, err := app.client.GetOptionPrices(cmd.Context(), args)
+			if err != nil {
+				return userFacingCommandError(err)
+			}
+			return output.WriteOptionPrices(cmd.OutOrStdout(), app.format, prices)
+		},
+	}
+
+	cmd.AddCommand(infoCmd, atmCmd, expiriesCmd, chainCmd, pricesCmd)
 	return cmd
 }
