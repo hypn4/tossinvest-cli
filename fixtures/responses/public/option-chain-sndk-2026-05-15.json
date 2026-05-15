@@ -1,0 +1,7 @@
+{
+  "result": [
+    {"strikePrice": 260.0, "callGuid": "OPT_SNDK260515C00260000_20260129", "putGuid": "OPT_SNDK260515P00260000_20260129", "callOpenInterest": 65, "putOpenInterest": 1042},
+    {"strikePrice": 265.0, "callGuid": "OPT_SNDK260515C00265000_20260129", "putGuid": "OPT_SNDK260515P00265000_20260129", "callOpenInterest": 12, "putOpenInterest": 88},
+    {"strikePrice": 1395.0, "callGuid": "OPT_SNDK260515C01395000_20260506", "putGuid": "OPT_SNDK260515P01395000_20260506", "callOpenInterest": 82, "putOpenInterest": 41}
+  ]
+}

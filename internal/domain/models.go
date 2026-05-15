@@ -412,3 +412,40 @@ type OptionInstrument struct {
 	PennyPilot          bool      `json:"penny_pilot,omitempty"`
 	FetchedAt           time.Time `json:"fetched_at"`
 }
+
+// OptionExpiry is one expiry-ladder entry returned by
+// /api/v1/option-maturity-date/get-all.
+type OptionExpiry struct {
+	MaturityDate                string `json:"maturity_date"`
+	MaturityDateTime            string `json:"maturity_date_time,omitempty"`
+	LiquidationDateTime         string `json:"liquidation_date_time,omitempty"`
+	DisplayLiquidationDateTime  string `json:"display_liquidation_date_time,omitempty"`
+	CorporateActionDateTime     string `json:"corporate_action_date_time,omitempty"`
+	CorporateActionName         string `json:"corporate_action_name,omitempty"`
+	DisplayCorporateActionName  string `json:"display_corporate_action_name,omitempty"`
+}
+
+// OptionChainRow is one strike row returned by /api/v1/option-both-chain/get-all.
+type OptionChainRow struct {
+	StrikePrice      float64      `json:"strike_price"`
+	CallGuid         string       `json:"call_guid,omitempty"`
+	PutGuid          string       `json:"put_guid,omitempty"`
+	CallOpenInterest int          `json:"call_open_interest,omitempty"`
+	PutOpenInterest  int          `json:"put_open_interest,omitempty"`
+	CallPrice        *OptionPrice `json:"call_price,omitempty"`
+	PutPrice         *OptionPrice `json:"put_price,omitempty"`
+}
+
+// OptionPrice is one price row returned by /api/v2/stock-prices (bulk).
+type OptionPrice struct {
+	Code             string  `json:"code"`
+	Base             float64 `json:"base,omitempty"`
+	Close            float64 `json:"close,omitempty"`
+	ChangeType       string  `json:"change_type,omitempty"`
+	Currency         string  `json:"currency,omitempty"`
+	Volume           float64 `json:"volume,omitempty"`
+	BaseKrw          float64 `json:"base_krw,omitempty"`
+	CloseKrw         float64 `json:"close_krw,omitempty"`
+	BaseKrwDecimal   float64 `json:"base_krw_decimal,omitempty"`
+	CloseKrwDecimal  float64 `json:"close_krw_decimal,omitempty"`
+}
