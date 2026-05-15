@@ -62,40 +62,43 @@ func WriteStockEstimates(w io.Writer, format Format, est domain.StockEstimates) 
 			return err
 		}
 
-		renderRevenueSection(w, est.Revenue)
-		renderEpsSection(w, est.EPS)
-		renderOpIncomeSection(w, est.OperatingIncome)
-		return nil
+		if err := renderRevenueSection(w, est.Revenue); err != nil {
+			return err
+		}
+		if err := renderEpsSection(w, est.EPS); err != nil {
+			return err
+		}
+		return renderOpIncomeSection(w, est.OperatingIncome)
 	default:
 		return fmt.Errorf("unsupported output format: %s", format)
 	}
 }
 
-func renderRevenueSection(w io.Writer, s domain.EstimateRevenueSeries) {
+func renderRevenueSection(w io.Writer, s domain.EstimateRevenueSeries) error {
 	pos := positionLabel(s.Position)
-	fmt.Fprintf(w, "\n=== Revenue forecast (next %s) ===\n", pos)
+	fmt.Fprintf(w, "\n=== Revenue forecast (%s) ===\n", pos)
 	fmt.Fprintf(w, "Next-period est: %s  fluctuation %+.2f%%\n", fmtUSDLargePtr(s.RevenueEst), s.FluctuationRate)
 	headers := []string{"PERIOD", "ACTUAL", "ESTIMATE", "SURPRISE"}
 	rows := make([][]string, len(s.Graph))
 	for i, p := range s.Graph {
 		rows[i] = []string{p.Period, fmtUSDLargePtr(p.Revenue), fmtUSDLargePtr(p.RevenueEst), fmtSurprisePtr(p.Surprise)}
 	}
-	renderTable(w, headers, rows)
+	return renderTable(w, headers, rows)
 }
 
-func renderEpsSection(w io.Writer, s domain.EstimateEpsSeries) {
+func renderEpsSection(w io.Writer, s domain.EstimateEpsSeries) error {
 	pos := positionLabel(s.Position)
-	fmt.Fprintf(w, "\n=== EPS forecast (next %s) ===\n", pos)
+	fmt.Fprintf(w, "\n=== EPS forecast (%s) ===\n", pos)
 	fmt.Fprintf(w, "Next-period est: %s  fluctuation %+.2f%%\n", fmtUSDSmallPtr(s.EPSEst), s.FluctuationRate)
 	headers := []string{"PERIOD", "ACTUAL", "ESTIMATE", "SURPRISE"}
 	rows := make([][]string, len(s.Graph))
 	for i, p := range s.Graph {
 		rows[i] = []string{p.Period, fmtUSDSmallPtr(p.EPS), fmtUSDSmallPtr(p.EPSEst), fmtSurprisePtr(p.Surprise)}
 	}
-	renderTable(w, headers, rows)
+	return renderTable(w, headers, rows)
 }
 
-func renderOpIncomeSection(w io.Writer, s domain.EstimateOperatingIncomeSeries) {
+func renderOpIncomeSection(w io.Writer, s domain.EstimateOperatingIncomeSeries) error {
 	pos := positionLabel(s.Position)
 	fmt.Fprintf(w, "\n=== Operating-income forecast (%s) ===\n", pos)
 	if s.OperatingIncomeEst == nil {
@@ -108,7 +111,7 @@ func renderOpIncomeSection(w io.Writer, s domain.EstimateOperatingIncomeSeries) 
 	for i, p := range s.Graph {
 		rows[i] = []string{p.Period, fmtUSDLargePtr(p.OperatingIncome), fmtUSDLargePtr(p.OperatingIncomeEst), fmtSurprisePtr(p.Surprise)}
 	}
-	renderTable(w, headers, rows)
+	return renderTable(w, headers, rows)
 }
 
 func positionLabel(p *string) string {
