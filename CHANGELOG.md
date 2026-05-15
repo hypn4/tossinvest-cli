@@ -17,10 +17,15 @@ All notable changes to this project will be documented in this file.
   데이터 소스: `wts-info-api.tossinvest.com/api/v1/dashboard/wts/overview/ai-signals{,/detail}` 와 `…/api/v2/…/signals`.
 - `tossctl orderable` — 한·미 주문가능금액 + 출금가능액 (결제일별) + 정산일 묶음을 한 번에. JSON 출력은 LLM 컨텍스트로 그대로 흘리기 좋게 단일 구조체.
 - `tossctl my fills <sym> [--tf thirty_minute]` — 본인 체결 내역을 30분 (또는 토스 지원 timeUnit) 버킷으로 출력. 차트 오버레이 용도.
+- `tossctl stock info <symbol>` — full 종목정보 deep tab (OVERVIEW / FINANCES / EARNINGS / ANALYST_OPINION / VALUATION_METRICS / COMPOSITION_OF_REVENUE / etc.) via `/api/v1/stock-detail/ui/{code}/info`.
+- `tossctl options info <OPT_…>` — single-option metadata (strike, expiry, bid/ask/mid, OI, contract unit, liquidation countdown, halt/suspend flags) via `/api/v2/stock-infos/{OPT_…}` + `optionInstrument` decoding.
+- `tossctl options nearest-atm <underlying>` — nearest-expiry ATM option's OPT_ productCode via `/api/v1/option-infos/default-chart-option`.
+- `OPT_…` productCodes route through `chartProductPrefix` to the `us-o` chart family, so `tossctl chart get OPT_... --tf 15m` works unchanged.
 
 ### Changed
 - `cmd/tossctl/chart.go`, `cmd/tossctl/quotes.go`, `cmd/tossctl/quote.go` long help text now documents that `--follow` is REST polling (no SSE/WebSocket from Toss) and that closed-market silence is correct behavior.
 - `tossctl portfolio` 가 `tradableQuantity`, `unsettledQuantity`, `evaluatedAmountAfterFees`, `profitLossAmountAfterFees`, `commission` (+ `commissionRate`), `tax` (+ `taxRate`), `delisting`, `nxtSupported`, `notice.{splitMerge,earningsAnnouncement}` 까지 노출. JSON 키는 모두 신규 — 기존 키는 그대로 유지되어 backward compatible.
+- `chartProductPrefix` now recognizes `OPT_` productCodes and returns `us-o`.
 
 ## [0.4.14] - 2026-05-14
 

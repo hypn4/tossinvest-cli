@@ -233,6 +233,9 @@ func (c *Client) GetChart(ctx context.Context, symbol string, opts ChartOptions)
 // Toss uses `kr-s` / `us-s` / `amx-s` / `nas-s` / `nys-s` etc. — the lower-case
 // first two letters of the market code followed by `-s` for stocks/ETFs.
 func chartProductPrefix(marketCode, productCode string) string {
+	if strings.HasPrefix(productCode, "OPT_") {
+		return "us-o"
+	}
 	mc := strings.ToLower(strings.TrimSpace(marketCode))
 	switch mc {
 	case "ksp", "ksq", "krx", "knx":

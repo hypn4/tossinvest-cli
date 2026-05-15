@@ -1,0 +1,40 @@
+{
+  "result": {
+    "code": "OPT_SNDK260515C01395000_20260506",
+    "guid": "OPT_SNDK260515C01395000_20260506",
+    "symbol": "SNDK260515C01395000",
+    "name": "샌디스크 $1,395 콜",
+    "market": {"code": "NSQ", "displayName": "NASDAQ"},
+    "currency": "USD",
+    "optionPennyPilotPriceSupported": true,
+    "optionInstrument": {
+      "marketCode": "CBOE",
+      "rootSymbol": "SNDK",
+      "name": "샌디스크 $1,395 콜",
+      "underlyingSymbol": "SNDK",
+      "underlyingGuid": "NAS0250224006",
+      "underlyingName": "샌디스크",
+      "maturityDate": "2026-05-15",
+      "maturityDateTime": "2026-05-16T03:50:00.000+09:00",
+      "putCall": "CALL",
+      "strikePrice": 1395.0,
+      "basePrice": 31.8,
+      "last": 31.8,
+      "bid": 30.1,
+      "ask": 33.9,
+      "mid": 32.0,
+      "contractUnit": 100.0,
+      "openInterest": 82,
+      "halted": false,
+      "tradingSuspended": false,
+      "buySuspended": false,
+      "sellSuspended": false,
+      "status": "LISTED",
+      "overtime": false,
+      "optionLiquidation": {
+        "liquidationDateTime": "2026-05-16T03:50:00.000+09:00",
+        "displayLiquidationDateTime": "2시간 46분 후 거래 종료"
+      }
+    }
+  }
+}
