@@ -6,16 +6,16 @@
         "productCode": "US20190226001",
         "primarySignal": {
           "signalLabel": "소식",
-          "signalInfo": "실적 발표",
+          "signalInfo": "실적이 발표됐어요. 2026년 3월 매출 $300.3만, 1주당 순이익 -$0.98",
           "signalId": 6000000,
-          "datetime": "2026-05-15T20:30:00"
+          "datetime": "2026-05-15T20:30:00Z"
         },
         "signals": [
           {
             "signalLabel": "소식",
             "signalInfo": "실적이 발표됐어요. 2026년 3월 매출 $300.3만, 1주당 순이익 -$0.98",
             "signalId": 6000000,
-            "datetime": "2026-05-15T20:30:00"
+            "datetime": "2026-05-15T20:30:00Z"
           }
         ]
       }

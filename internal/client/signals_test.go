@@ -108,3 +108,32 @@ func TestGetSignalDetail(t *testing.T) {
 		t.Fatalf("unexpected related list: %+v", detail.Related)
 	}
 }
+
+func TestListEventSignals(t *testing.T) {
+	t.Parallel()
+
+	root := signalsFixtureRoot(t)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/v2/dashboard/wts/overview/signals" {
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+		http.ServeFile(w, r, filepath.Join(root, "signals-events.json"))
+	}))
+	defer server.Close()
+
+	c := New(Config{HTTPClient: server.Client(), InfoBaseURL: server.URL})
+	events, err := c.ListEventSignals(context.Background(), []string{"US20190226001"})
+	if err != nil {
+		t.Fatalf("ListEventSignals returned error: %v", err)
+	}
+	if len(events) != 1 {
+		t.Fatalf("expected 1 event, got %d", len(events))
+	}
+	ev := events[0]
+	if ev.SignalLabel != "소식" || ev.SignalID != 6000000 {
+		t.Fatalf("unexpected event: %+v", ev)
+	}
+	if !strings.Contains(ev.SignalInfo, "실적이 발표됐어요") {
+		t.Fatalf("event info missing earnings text: %s", ev.SignalInfo)
+	}
+}

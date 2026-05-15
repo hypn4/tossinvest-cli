@@ -166,3 +166,62 @@ func (c *Client) GetSignalDetail(ctx context.Context, productCode string) (domai
 	}
 	return detail, nil
 }
+
+type eventSignalsEnvelope struct {
+	Result struct {
+		ExposeSignals bool `json:"exposeSignals"`
+		SignalsList   []struct {
+			ProductCode   string `json:"productCode"`
+			PrimarySignal struct {
+				SignalLabel string    `json:"signalLabel"`
+				SignalInfo  string    `json:"signalInfo"`
+				SignalID    int64     `json:"signalId"`
+				DateTime    time.Time `json:"datetime"`
+			} `json:"primarySignal"`
+			Signals []struct {
+				SignalLabel string    `json:"signalLabel"`
+				SignalInfo  string    `json:"signalInfo"`
+				SignalID    int64     `json:"signalId"`
+				DateTime    time.Time `json:"datetime"`
+			} `json:"signals"`
+		} `json:"signalsList"`
+	} `json:"result"`
+}
+
+// ListEventSignals returns scheduled event signals (earnings, disclosures, ...).
+// Currently emits one row per product, using the "primarySignal" field.
+func (c *Client) ListEventSignals(ctx context.Context, productCodes []string) ([]domain.EventSignal, error) {
+	cleaned := make([]string, 0, len(productCodes))
+	for _, code := range productCodes {
+		code = strings.TrimSpace(code)
+		if code != "" {
+			cleaned = append(cleaned, code)
+		}
+	}
+	if len(cleaned) == 0 {
+		return nil, fmt.Errorf("ListEventSignals: at least one product code is required")
+	}
+
+	body, err := json.Marshal(map[string]any{"productCodes": cleaned, "filters": []string{}})
+	if err != nil {
+		return nil, err
+	}
+	endpoint := fmt.Sprintf("%s/api/v2/dashboard/wts/overview/signals", c.infoBaseURL)
+
+	var envelope eventSignalsEnvelope
+	if err := c.postJSON(ctx, endpoint, body, &envelope); err != nil {
+		return nil, err
+	}
+
+	out := make([]domain.EventSignal, 0, len(envelope.Result.SignalsList))
+	for _, row := range envelope.Result.SignalsList {
+		out = append(out, domain.EventSignal{
+			ProductCode: row.ProductCode,
+			SignalLabel: row.PrimarySignal.SignalLabel,
+			SignalInfo:  row.PrimarySignal.SignalInfo,
+			SignalID:    row.PrimarySignal.SignalID,
+			DateTime:    row.PrimarySignal.DateTime,
+		})
+	}
+	return out, nil
+}
