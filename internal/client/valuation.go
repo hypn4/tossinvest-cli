@@ -60,17 +60,15 @@ func (c *Client) GetStockValuation(ctx context.Context, symbol string) (domain.S
 
 	peers := make([]domain.PeerValuation, 0, len(cmpEnv.Result.StockGraphs))
 	for _, g := range cmpEnv.Result.StockGraphs {
-		var value float64
-		var period string
-		if n := len(g.Graph); n > 0 {
-			value = g.Graph[n-1].Value
-			period = g.Graph[n-1].Period
+		if len(g.Graph) == 0 {
+			continue
 		}
+		last := g.Graph[len(g.Graph)-1]
 		peers = append(peers, domain.PeerValuation{
 			ProductCode: g.Code,
 			Name:        g.Name,
-			Value:       value,
-			Period:      period,
+			Value:       last.Value,
+			Period:      last.Period,
 			IsSelf:      g.Code == productCode,
 		})
 	}

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -56,5 +57,33 @@ func TestGetStockValuationFromFixture(t *testing.T) {
 	}
 	if !found {
 		t.Fatalf("expected self peer row with NAS0250224006/45.4; peers=%+v", val.Peers)
+	}
+}
+
+func TestGetStockValuationSkipsPeersWithEmptyGraph(t *testing.T) {
+	t.Parallel()
+	eval := `{"result":{"per":1,"pbr":1,"psr":1,"median":1,"position":"NORMAL"}}`
+	cmp := `{"result":{"selectedFactor":{"code":"PER"},"selectedTics":{"displayName":"X"},"stockGraphs":[
+		{"code":"NAS0250224006","name":"self","graph":[{"period":"Q1","value":10}]},
+		{"code":"PEER_EMPTY","name":"empty","graph":[]}
+	]}}`
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.Contains(r.URL.Path, "evaluation-comparison") {
+			w.Write([]byte(cmp))
+		} else {
+			w.Write([]byte(eval))
+		}
+	}))
+	defer server.Close()
+	c := New(Config{HTTPClient: server.Client(), InfoBaseURL: server.URL})
+	val, err := c.GetStockValuation(context.Background(), "NAS0250224006")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(val.Peers) != 1 {
+		t.Fatalf("expected 1 peer (empty-graph skipped), got %d: %+v", len(val.Peers), val.Peers)
+	}
+	if val.Peers[0].ProductCode != "NAS0250224006" {
+		t.Fatalf("expected self peer kept, got %q", val.Peers[0].ProductCode)
 	}
 }
