@@ -1,0 +1,45 @@
+{
+  "stability": {
+    "result": {
+      "liabilityRatio": 0.0,
+      "currentRatio": 478.247,
+      "interestCoverageRatio": 68516.667,
+      "median": 32.87132985260365,
+      "position": "LOW"
+    }
+  },
+  "revenue": {
+    "result": {
+      "companyName": "샌디스크",
+      "recentFiscalYear": 2026,
+      "recentFiscalQuarter": 1,
+      "recentNetProfit": 3615000000.0,
+      "recentNetProfitKrw": 5490462000000.0,
+      "fluctuationRate": 350.18,
+      "position": "HIGH",
+      "graph": [
+        {"period": "2025-06", "revenue": 1923000000.0, "revenueKrw": 2607132000000.0, "netProfit": 252000000.0, "netProfitKrw": 341693200000.0, "netProfitRatio": 13.10452418096827},
+        {"period": "2025-09", "revenue": 2308000000.0, "revenueKrw": 3243160800000.0, "netProfit": 803000000.0, "netProfitKrw": 1128616600000.0, "netProfitRatio": 34.79202772357020},
+        {"period": "2025-12", "revenue": 2306000000.0, "revenueKrw": 3380840800000.0, "netProfit": 887000000.0, "netProfitKrw": 1300316600000.0, "netProfitRatio": 38.46487424934085},
+        {"period": "2026-03", "revenue": 3092000000.0, "revenueKrw": 4699192000000.0, "netProfit": 3615000000.0, "netProfitKrw": 5490462000000.0, "netProfitRatio": 116.9133161709574}
+      ]
+    }
+  },
+  "operatingIncome": {
+    "result": {
+      "companyName": "샌디스크",
+      "recentFiscalYear": 2026,
+      "recentFiscalQuarter": 1,
+      "recentOperatingIncome": 4111000000.0,
+      "recentOperatingIncomeKrw": 6243786800000.0,
+      "fluctuationRate": 286.0,
+      "position": "HIGH",
+      "graph": [
+        {"period": "2025-06", "operatingIncome": 18000000.0, "operatingIncomeKrw": 24436800000.0, "operatingIncomeRatio": 0.9360374415990639},
+        {"period": "2025-09", "operatingIncome": 879000000.0, "operatingIncomeKrw": 1234950600000.0, "operatingIncomeRatio": 38.085355285961},
+        {"period": "2025-12", "operatingIncome": 1067000000.0, "operatingIncomeKrw": 1564265600000.0, "operatingIncomeRatio": 46.27059843885515},
+        {"period": "2026-03", "operatingIncome": 4111000000.0, "operatingIncomeKrw": 6243786800000.0, "operatingIncomeRatio": 132.95019405562743}
+      ]
+    }
+  }
+}

@@ -134,6 +134,11 @@
       "file": "analyst-snapshot-sndk.json",
       "url": "(combined opinion+consensus+reports fixture for testing only)",
       "method": "GET"
+    },
+    {
+      "file": "stock-financials-sndk.json",
+      "url": "(combined stability+revenue+operating-income fixture for testing only)",
+      "method": "POST"
     }
   ]
 }

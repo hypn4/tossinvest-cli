@@ -615,3 +615,57 @@ type AnalystReport struct {
 	Date   string `json:"date"`
 	URL    string `json:"url,omitempty"`
 }
+
+type StockFinancials struct {
+	ProductCode     string                `json:"product_code"`
+	Stability       StabilityRatios       `json:"stability"`
+	Revenue         RevenueSeries         `json:"revenue"`
+	OperatingIncome OperatingIncomeSeries `json:"operating_income"`
+	FetchedAt       time.Time             `json:"fetched_at"`
+}
+
+type StabilityRatios struct {
+	LiabilityRatio        float64 `json:"liability_ratio"`
+	CurrentRatio          float64 `json:"current_ratio"`
+	InterestCoverageRatio float64 `json:"interest_coverage_ratio"`
+	IndustryMedian        float64 `json:"industry_median"`
+	Position              string  `json:"position"` // HIGH|LOW|NORMAL
+}
+
+type RevenueSeries struct {
+	CompanyName         string         `json:"company_name"`
+	RecentFiscalYear    int            `json:"recent_fiscal_year"`
+	RecentFiscalQuarter int            `json:"recent_fiscal_quarter"`
+	RecentNetProfit     float64        `json:"recent_net_profit"`
+	RecentNetProfitKrw  float64        `json:"recent_net_profit_krw"`
+	FluctuationRate     float64        `json:"fluctuation_rate"`
+	Position            string         `json:"position"`
+	Graph               []RevenuePoint `json:"graph"`
+}
+
+type RevenuePoint struct {
+	Period         string  `json:"period"`
+	Revenue        float64 `json:"revenue"`
+	RevenueKrw     float64 `json:"revenue_krw"`
+	NetProfit      float64 `json:"net_profit"`
+	NetProfitKrw   float64 `json:"net_profit_krw"`
+	NetProfitRatio float64 `json:"net_profit_ratio"`
+}
+
+type OperatingIncomeSeries struct {
+	CompanyName              string                 `json:"company_name"`
+	RecentFiscalYear         int                    `json:"recent_fiscal_year"`
+	RecentFiscalQuarter      int                    `json:"recent_fiscal_quarter"`
+	RecentOperatingIncome    float64                `json:"recent_operating_income"`
+	RecentOperatingIncomeKrw float64                `json:"recent_operating_income_krw"`
+	FluctuationRate          float64                `json:"fluctuation_rate"`
+	Position                 string                 `json:"position"`
+	Graph                    []OperatingIncomePoint `json:"graph"`
+}
+
+type OperatingIncomePoint struct {
+	Period               string  `json:"period"`
+	OperatingIncome      float64 `json:"operating_income"`
+	OperatingIncomeKrw   float64 `json:"operating_income_krw"`
+	OperatingIncomeRatio float64 `json:"operating_income_ratio"`
+}
