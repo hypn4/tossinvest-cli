@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+- `tossctl orderable` — 한·미 주문가능금액 + 출금가능액 (결제일별) + 정산일 묶음을 한 번에. JSON 출력은 LLM 컨텍스트로 그대로 흘리기 좋게 단일 구조체.
+- `tossctl my fills <sym> [--tf thirty_minute]` — 본인 체결 내역을 30분 (또는 토스 지원 timeUnit) 버킷으로 출력. 차트 오버레이 용도.
+
+### Changed
+- `tossctl portfolio` 가 `tradableQuantity`, `unsettledQuantity`, `evaluatedAmountAfterFees`, `profitLossAmountAfterFees`, `commission` (+ `commissionRate`), `tax` (+ `taxRate`), `delisting`, `nxtSupported`, `notice.{splitMerge,earningsAnnouncement}` 까지 노출. JSON 키는 모두 신규 — 기존 키는 그대로 유지되어 backward compatible.
+
 ## [0.4.14] - 2026-05-14
 
 ### Changed
