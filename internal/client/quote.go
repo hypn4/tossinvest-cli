@@ -322,10 +322,23 @@ func normalizeProductCode(symbol string) string {
 }
 
 func looksLikeProductCode(value string) bool {
+	if strings.HasPrefix(value, "OPT_") {
+		return true
+	}
 	if len(value) == 7 && value[0] == 'A' {
 		return true
 	}
-	if len(value) >= 8 && value[0] >= 'A' && value[0] <= 'Z' && value[1] >= 'A' && value[1] <= 'Z' {
+	// 3-letter market prefix + digits: NAS0250224006, AMX0260127004, NYS…
+	if len(value) >= 4 && isAlpha(value[0]) && isAlpha(value[1]) && isAlpha(value[2]) {
+		for i := 3; i < len(value); i++ {
+			if value[i] < '0' || value[i] > '9' {
+				return false
+			}
+		}
+		return true
+	}
+	// 2-letter prefix + digits: US20100311002
+	if len(value) >= 8 && isAlpha(value[0]) && isAlpha(value[1]) {
 		hasDigit := false
 		for i := 2; i < len(value); i++ {
 			if value[i] >= '0' && value[i] <= '9' {
@@ -338,6 +351,8 @@ func looksLikeProductCode(value string) bool {
 	}
 	return false
 }
+
+func isAlpha(b byte) bool { return b >= 'A' && b <= 'Z' }
 
 func firstNonEmpty(values ...string) string {
 	for _, value := range values {
