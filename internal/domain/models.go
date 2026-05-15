@@ -492,9 +492,9 @@ type CompanyProfile struct {
 // Each section is the raw map of keys returned by Toss for that block; callers
 // route by section name.
 type StockIndicators struct {
-	ProductCode string                     `json:"productCode"`
+	ProductCode string                     `json:"product_code"`
 	Sections    map[string]IndicatorFields `json:"sections"` // key: 가치평가|수익|배당|안정성
-	FetchedAt   time.Time                  `json:"fetchedAt"`
+	FetchedAt   time.Time                  `json:"fetched_at"`
 }
 
 // IndicatorFields holds the raw per-section payload as decoded JSON.
@@ -503,7 +503,7 @@ type IndicatorFields map[string]any
 // StockValuation aggregates the per-stock valuation snapshot (evaluation) and
 // peer comparison matrix (evaluation-comparison).
 type StockValuation struct {
-	ProductCode string          `json:"productCode"`
+	ProductCode string          `json:"product_code"`
 	PER         float64         `json:"per"`
 	PBR         float64         `json:"pbr"`
 	PSR         float64         `json:"psr"`
@@ -512,29 +512,29 @@ type StockValuation struct {
 	Factor      string          `json:"factor"`        // PER (default), PBR, PSR, …
 	Industry    string          `json:"industry"`      // selectedTics displayName
 	Peers       []PeerValuation `json:"peers"`
-	FetchedAt   time.Time       `json:"fetchedAt"`
+	FetchedAt   time.Time       `json:"fetched_at"`
 }
 
 // PeerValuation is one row in the peer comparison table. `Value` is the most
 // recent graph point for the selected factor.
 type PeerValuation struct {
-	ProductCode string  `json:"productCode"`
+	ProductCode string  `json:"product_code"`
 	Name        string  `json:"name"`
 	Value       float64 `json:"value"`
 	Period      string  `json:"period"`
-	IsSelf      bool    `json:"isSelf"`
+	IsSelf      bool    `json:"is_self"`
 }
 
 // SalesComposition is the revenue breakdown by business segment returned by
 // /api/v1/companies/{companyCode}/sales-compositions.
 type SalesComposition struct {
-	ProductCode string                 `json:"productCode"`
-	CompanyCode string                 `json:"companyCode"`
-	FiscalYear  int                    `json:"fiscalYear"`
-	EndDate     string                 `json:"endDate"`
+	ProductCode string                 `json:"product_code"`
+	CompanyCode string                 `json:"company_code"`
+	FiscalYear  int                    `json:"fiscal_year"`
+	EndDate     string                 `json:"end_date"`
 	Items       []SalesCompositionItem `json:"items"`
-	DataSource  string                 `json:"dataSource"`
-	FetchedAt   time.Time              `json:"fetchedAt"`
+	DataSource  string                 `json:"data_source"`
+	FetchedAt   time.Time              `json:"fetched_at"`
 }
 
 type SalesCompositionItem struct {
@@ -544,50 +544,50 @@ type SalesCompositionItem struct {
 }
 
 type TICSIndustry struct {
-	ProductCode string      `json:"productCode"`
-	CompanyCode string      `json:"companyCode"`
-	BaseDate    string      `json:"baseDate"`
+	ProductCode string      `json:"product_code"`
+	CompanyCode string      `json:"company_code"`
+	BaseDate    string      `json:"base_date"`
 	Major       []TICSEntry `json:"major"`
 	Minor       []TICSEntry `json:"minor"`
-	FetchedAt   time.Time   `json:"fetchedAt"`
+	FetchedAt   time.Time   `json:"fetched_at"`
 }
 
 type TICSEntry struct {
 	ID             int           `json:"id"`
 	Title          string        `json:"title"`
 	Description    string        `json:"description"`
-	CompanyCount   int           `json:"companyCount"`
+	CompanyCount   int           `json:"company_count"`
 	Representative bool          `json:"representative"`
 	Rankings       []TICSRanking `json:"rankings"`
 }
 
 type TICSRanking struct {
-	BaseDate     string  `json:"baseDate"`
-	FiscalPeriod string  `json:"fiscalPeriod"`
-	TypeName     string  `json:"typeName"`     // 시가총액|매출|영업이익률
+	BaseDate     string  `json:"base_date"`
+	FiscalPeriod string  `json:"fiscal_period"`
+	TypeName     string  `json:"type_name"`     // 시가총액|매출|영업이익률
 	Ranking      int     `json:"ranking"`
-	CompanyCount int     `json:"companyCount"`
-	DisplayValue string  `json:"displayValue"`
+	CompanyCount int     `json:"company_count"`
+	DisplayValue string  `json:"display_value"`
 	Value        float64 `json:"value"`
 }
 
 type AnalystSnapshot struct {
-	ProductCode string          `json:"productCode"`
+	ProductCode string          `json:"product_code"`
 	Opinion     AnalystOpinion  `json:"opinion"`
 	Consensus   ConsensusTarget `json:"consensus"`
 	Reports     []AnalystReport `json:"reports"`
-	FetchedAt   time.Time       `json:"fetchedAt"`
+	FetchedAt   time.Time       `json:"fetched_at"`
 }
 
 type AnalystOpinion struct {
 	Type        string  `json:"type"`        // BUY|HOLD|SELL
-	StrongBuy   int     `json:"strongBuy"`
+	StrongBuy   int     `json:"strong_buy"`
 	Buy         int     `json:"buy"`
 	Hold        int     `json:"hold"`
 	Sell        int     `json:"sell"`
-	StrongSell  int     `json:"strongSell"`
-	TargetUSD   float64 `json:"targetUSD"`
-	TargetKRW   float64 `json:"targetKRW"`
+	StrongSell  int     `json:"strong_sell"`
+	TargetUSD   float64 `json:"target_usd"`
+	TargetKRW   float64 `json:"target_krw"`
 	Description string  `json:"description"`
 }
 
@@ -595,18 +595,18 @@ type ConsensusTarget struct {
 	Mean       float64              `json:"mean"`
 	High       float64              `json:"high"`
 	Low        float64              `json:"low"`
-	MeanKRW    float64              `json:"meanKRW"`
-	HighKRW    float64              `json:"highKRW"`
-	LowKRW     float64              `json:"lowKRW"`
+	MeanKRW    float64              `json:"mean_krw"`
+	HighKRW    float64              `json:"high_krw"`
+	LowKRW     float64              `json:"low_krw"`
 	Currency   string               `json:"currency"`
-	PointDate  string               `json:"pointDate"`
-	PastCloses []ConsensusPastClose `json:"pastCloses"`
+	PointDate  string               `json:"point_date"`
+	PastCloses []ConsensusPastClose `json:"past_closes"`
 }
 
 type ConsensusPastClose struct {
 	Date     string  `json:"date"`
 	Price    float64 `json:"price"`
-	PriceKRW float64 `json:"priceKRW"`
+	PriceKRW float64 `json:"price_krw"`
 }
 
 type AnalystReport struct {
