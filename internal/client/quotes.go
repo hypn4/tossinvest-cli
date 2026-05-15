@@ -326,12 +326,17 @@ func (s *OrderBookStream) emit(book domain.OrderBook) {
 
 // hashOrderBook produces a stable hash of the price/volume vectors. FNV-1a 64
 // keeps the implementation dependency-free; collisions are negligible at this
-// payload size.
+// payload size. Levels are sorted by price before hashing so the hash is
+// invariant under any server-side reordering of the same book.
 func hashOrderBook(book domain.OrderBook) uint64 {
 	h := fnv.New64a()
 	var buf [8]byte
 	hashLevels := func(levels []domain.OrderBookLevel) {
-		for _, lvl := range levels {
+		sorted := append([]domain.OrderBookLevel(nil), levels...)
+		sort.SliceStable(sorted, func(i, j int) bool {
+			return sorted[i].Price < sorted[j].Price
+		})
+		for _, lvl := range sorted {
 			binary.BigEndian.PutUint64(buf[:], math.Float64bits(lvl.Price))
 			h.Write(buf[:])
 			binary.BigEndian.PutUint64(buf[:], math.Float64bits(lvl.Volume))
