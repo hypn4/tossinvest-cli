@@ -64,3 +64,43 @@ func TestWriteOrderBookCSV(t *testing.T) {
 		t.Fatalf("unexpected header: %s", lines[0])
 	}
 }
+
+var sampleTicks = []domain.Tick{
+	{Time: "21:09:40", ProductCode: "US20100311002", Price: 168.60, Volume: 2, TradeType: "SELL", CumulativeVolume: 1731781},
+	{Time: "21:09:39", ProductCode: "US20100311002", Price: 168.66, Volume: 1, TradeType: "BUY", CumulativeVolume: 1731779},
+}
+
+func TestWriteTicksJSON(t *testing.T) {
+	var buf bytes.Buffer
+	if err := WriteTicks(&buf, FormatJSON, sampleTicks); err != nil {
+		t.Fatalf("error: %v", err)
+	}
+	var parsed []domain.Tick
+	if err := json.Unmarshal(buf.Bytes(), &parsed); err != nil {
+		t.Fatalf("json unmarshal: %v", err)
+	}
+	if len(parsed) != 2 {
+		t.Fatalf("expected 2 ticks, got %d", len(parsed))
+	}
+}
+
+func TestWriteTicksCSV(t *testing.T) {
+	var buf bytes.Buffer
+	if err := WriteTicks(&buf, FormatCSV, sampleTicks); err != nil {
+		t.Fatalf("error: %v", err)
+	}
+	lines := strings.Split(strings.TrimSpace(buf.String()), "\n")
+	if len(lines) != 3 {
+		t.Fatalf("expected header + 2 rows, got %d", len(lines))
+	}
+}
+
+func TestWriteTicksTable(t *testing.T) {
+	var buf bytes.Buffer
+	if err := WriteTicks(&buf, FormatTable, sampleTicks); err != nil {
+		t.Fatalf("error: %v", err)
+	}
+	if !strings.Contains(buf.String(), "21:09:40") {
+		t.Fatalf("expected first tick time in table: %s", buf.String())
+	}
+}
