@@ -51,6 +51,34 @@ func TestGetOptionInstrumentRejectsNonOPT(t *testing.T) {
 	}
 }
 
+func TestListOptionExpiriesFromFixture(t *testing.T) {
+	t.Parallel()
+	root := fixtureRoot(t)
+	body := mustReadFile(t, filepath.Join(root, "option-expiries-sndk.json"))
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/v1/option-maturity-date/get-all" {
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+		if r.URL.Query().Get("underlyingGuid") != "NAS0250224006" {
+			t.Fatalf("unexpected underlyingGuid: %s", r.URL.Query().Get("underlyingGuid"))
+		}
+		w.Write(body)
+	}))
+	defer server.Close()
+
+	c := New(Config{HTTPClient: server.Client(), InfoBaseURL: server.URL})
+	exps, err := c.ListOptionExpiries(context.Background(), "NAS0250224006")
+	if err != nil {
+		t.Fatalf("ListOptionExpiries error: %v", err)
+	}
+	if len(exps) != 2 {
+		t.Fatalf("expected 2 expiries, got %d", len(exps))
+	}
+	if exps[0].MaturityDate != "2026-05-15" || exps[0].DisplayLiquidationDateTime != "24분 후 거래 종료" {
+		t.Fatalf("unexpected first expiry: %+v", exps[0])
+	}
+}
+
 func TestGetNearestATMOptionFromFixture(t *testing.T) {
 	t.Parallel()
 	root := fixtureRoot(t)

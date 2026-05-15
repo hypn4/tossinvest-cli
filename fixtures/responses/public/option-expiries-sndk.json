@@ -1,0 +1,24 @@
+{
+  "result": {
+    "items": [
+      {
+        "maturityDate": "2026-05-15",
+        "maturityDateTime": "2026-05-16T03:50:00.000+09:00",
+        "liquidationDateTime": "2026-05-15T14:50:00-04:00",
+        "displayLiquidationDateTime": "24분 후 거래 종료",
+        "corporateActionDateTime": null,
+        "corporateActionName": null,
+        "displayCorporateActionName": null
+      },
+      {
+        "maturityDate": "2026-05-22",
+        "maturityDateTime": "2026-05-23T03:50:00.000+09:00",
+        "liquidationDateTime": "2026-05-22T14:50:00-04:00",
+        "displayLiquidationDateTime": "7일 후 거래 종료",
+        "corporateActionDateTime": null,
+        "corporateActionName": null,
+        "displayCorporateActionName": null
+      }
+    ]
+  }
+}

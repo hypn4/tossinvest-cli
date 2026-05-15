@@ -120,3 +120,51 @@ func (c *Client) GetNearestATMOption(ctx context.Context, underlying string) (st
 	}
 	return envelope.Result, nil
 }
+
+type optionExpiriesEnvelope struct {
+	Result struct {
+		Items []struct {
+			MaturityDate               string `json:"maturityDate"`
+			MaturityDateTime           string `json:"maturityDateTime"`
+			LiquidationDateTime        string `json:"liquidationDateTime"`
+			DisplayLiquidationDateTime string `json:"displayLiquidationDateTime"`
+			CorporateActionDateTime    string `json:"corporateActionDateTime"`
+			CorporateActionName        string `json:"corporateActionName"`
+			DisplayCorporateActionName string `json:"displayCorporateActionName"`
+		} `json:"items"`
+	} `json:"result"`
+}
+
+// ListOptionExpiries returns the expiry ladder for an underlying.
+// Accepts symbol or productCode.
+func (c *Client) ListOptionExpiries(ctx context.Context, underlying string) ([]domain.OptionExpiry, error) {
+	productCode, err := c.resolveProductCode(ctx, underlying)
+	if err != nil {
+		return nil, err
+	}
+	endpoint, err := url.Parse(fmt.Sprintf("%s/api/v1/option-maturity-date/get-all", c.infoBaseURL))
+	if err != nil {
+		return nil, err
+	}
+	q := endpoint.Query()
+	q.Set("underlyingGuid", productCode)
+	endpoint.RawQuery = q.Encode()
+
+	var env optionExpiriesEnvelope
+	if err := c.getJSON(ctx, endpoint.String(), &env); err != nil {
+		return nil, err
+	}
+	out := make([]domain.OptionExpiry, 0, len(env.Result.Items))
+	for _, it := range env.Result.Items {
+		out = append(out, domain.OptionExpiry{
+			MaturityDate:               it.MaturityDate,
+			MaturityDateTime:           it.MaturityDateTime,
+			LiquidationDateTime:        it.LiquidationDateTime,
+			DisplayLiquidationDateTime: it.DisplayLiquidationDateTime,
+			CorporateActionDateTime:    it.CorporateActionDateTime,
+			CorporateActionName:        it.CorporateActionName,
+			DisplayCorporateActionName: it.DisplayCorporateActionName,
+		})
+	}
+	return out, nil
+}

@@ -89,6 +89,11 @@
       "file": "option-default-chart-option-sndk.json",
       "url": "https://wts-info-api.tossinvest.com/api/v1/option-infos/default-chart-option?underlyingGuid=NAS0250224006",
       "method": "GET"
+    },
+    {
+      "file": "option-expiries-sndk.json",
+      "url": "https://wts-info-api.tossinvest.com/api/v1/option-maturity-date/get-all?underlyingGuid=NAS0250224006",
+      "method": "GET"
     }
   ]
 }
