@@ -1,0 +1,51 @@
+{
+  "result": {
+    "indicatorSections": [
+      {
+        "sectionName": "가치평가",
+        "data": {
+          "displayPer": "45.4배",
+          "displayPbr": "14.9배",
+          "displayPsr": "15.5배"
+        }
+      },
+      {
+        "sectionName": "수익",
+        "data": {
+          "eps": 28.76,
+          "epsKrw": 42904,
+          "bps": 93.08,
+          "bpsKrw": 138856,
+          "roe": "39.3%"
+        }
+      },
+      {
+        "sectionName": "배당",
+        "data": {
+          "dividendFrequency": null,
+          "dividendYieldRatio": 0,
+          "currency": "USD",
+          "annualCash": null,
+          "annualCashKrw": null,
+          "months": [],
+          "exDate": null,
+          "lastYear": 2025,
+          "lastYearDividendInfo": {
+            "dividendCount": 0,
+            "dividendMonths": [],
+            "dividendCash": 0,
+            "dividendCashKrw": null,
+            "dividendYieldRatio": 0,
+            "ttmDividendYieldRatio": 0,
+            "ttmDividendMonths": [],
+            "ttmDps": 0.00,
+            "ttmDpsKrw": null,
+            "ttmDividendTotalCount": 0,
+            "dividendGrowthRatio": null,
+            "currency": null
+          }
+        }
+      }
+    ]
+  }
+}

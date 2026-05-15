@@ -68,6 +68,32 @@ Examples:
 		},
 	}
 
-	cmd.AddCommand(infoCmd, overviewCmd)
+	indicatorsCmd := &cobra.Command{
+		Use:   "indicators <symbol>",
+		Short: "Show investment indicators (가치평가/수익/배당/안정성)",
+		Long: `Fetch the investment indicators payload from
+/api/v1/stock-detail/ui/wts/{code}/investment-indicators.
+
+Returns four sectioned blocks: 가치평가 (PER/PBR/PSR), 수익 (EPS/BPS/ROE),
+배당 (frequency, yield, annual cash), 안정성 (debt/current ratios).
+
+Examples:
+  tossctl stock indicators SNDK
+  tossctl stock indicators NAS0250224006 --output json`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			app, err := newAppContext(opts)
+			if err != nil {
+				return err
+			}
+			ind, err := app.client.GetStockIndicators(cmd.Context(), args[0])
+			if err != nil {
+				return userFacingCommandError(err)
+			}
+			return output.WriteStockIndicators(cmd.OutOrStdout(), app.format, ind)
+		},
+	}
+
+	cmd.AddCommand(infoCmd, overviewCmd, indicatorsCmd)
 	return cmd
 }

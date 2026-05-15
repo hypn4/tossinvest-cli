@@ -109,6 +109,11 @@
       "file": "stock-overview-sndk.json",
       "url": "https://wts-info-api.tossinvest.com/api/v2/stock-infos/NAS0250224006/overview",
       "method": "GET"
+    },
+    {
+      "file": "stock-indicators-sndk.json",
+      "url": "https://wts-info-api.tossinvest.com/api/v1/stock-detail/ui/wts/NAS0250224006/investment-indicators",
+      "method": "GET"
     }
   ]
 }

@@ -486,3 +486,16 @@ type CompanyProfile struct {
 	MarketValueKrw    float64 `json:"market_value_krw,omitempty"`
 	Currency          string  `json:"currency,omitempty"`
 }
+
+// StockIndicators is the aggregated valuation/earnings/dividend/stability
+// snapshot returned by /api/v1/stock-detail/ui/wts/{code}/investment-indicators.
+// Each section is the raw map of keys returned by Toss for that block; callers
+// route by section name.
+type StockIndicators struct {
+	ProductCode string                     `json:"productCode"`
+	Sections    map[string]IndicatorFields `json:"sections"` // key: 가치평가|수익|배당|안정성
+	FetchedAt   time.Time                  `json:"fetchedAt"`
+}
+
+// IndicatorFields holds the raw per-section payload as decoded JSON.
+type IndicatorFields map[string]any
