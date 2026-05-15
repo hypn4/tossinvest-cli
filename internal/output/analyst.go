@@ -61,9 +61,9 @@ func WriteAnalystSnapshot(w io.Writer, format Format, snap domain.AnalystSnapsho
 		fmt.Fprintf(w, "\n=== 컨센서스 목표가 (%s 기준) ===\n", snap.Consensus.PointDate)
 		headers := []string{"FIELD", "USD", "KRW"}
 		rows := [][]string{
-			{"mean", fmt.Sprintf("$%.2f", snap.Consensus.Mean), formatWithCommas(int64(snap.Consensus.MeanKRW))},
-			{"high", fmt.Sprintf("$%.2f", snap.Consensus.High), formatWithCommas(int64(snap.Consensus.HighKRW))},
-			{"low", fmt.Sprintf("$%.2f", snap.Consensus.Low), formatWithCommas(int64(snap.Consensus.LowKRW))},
+			{"mean", formatUSD(snap.Consensus.Mean), formatWithCommas(int64(snap.Consensus.MeanKRW))},
+			{"high", formatUSD(snap.Consensus.High), formatWithCommas(int64(snap.Consensus.HighKRW))},
+			{"low", formatUSD(snap.Consensus.Low), formatWithCommas(int64(snap.Consensus.LowKRW))},
 		}
 		if err := renderTable(w, headers, rows); err != nil {
 			return err
@@ -74,7 +74,7 @@ func WriteAnalystSnapshot(w io.Writer, format Format, snap domain.AnalystSnapsho
 			headers = []string{"DATE", "PRICE (USD)", "PRICE (KRW)"}
 			rows = make([][]string, len(snap.Consensus.PastCloses))
 			for i, p := range snap.Consensus.PastCloses {
-				rows[i] = []string{p.Date, fmt.Sprintf("$%.2f", p.Price), formatWithCommas(int64(p.PriceKRW))}
+				rows[i] = []string{p.Date, formatUSD(p.Price), formatWithCommas(int64(p.PriceKRW))}
 			}
 			if err := renderTable(w, headers, rows); err != nil {
 				return err
