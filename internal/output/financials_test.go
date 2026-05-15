@@ -2,6 +2,8 @@ package output
 
 import (
 	"bytes"
+	"encoding/csv"
+	"encoding/json"
 	"strings"
 	"testing"
 	"time"
@@ -9,9 +11,8 @@ import (
 	"github.com/junghoonkye/tossinvest-cli/internal/domain"
 )
 
-func TestWriteStockFinancialsTable(t *testing.T) {
-	t.Parallel()
-	fin := domain.StockFinancials{
+func financialsTestFixture() domain.StockFinancials {
+	return domain.StockFinancials{
 		ProductCode: "NAS0250224006",
 		Stability: domain.StabilityRatios{
 			LiabilityRatio:        0.0,
@@ -42,6 +43,11 @@ func TestWriteStockFinancialsTable(t *testing.T) {
 		},
 		FetchedAt: time.Date(2026, 5, 16, 0, 0, 0, 0, time.UTC),
 	}
+}
+
+func TestWriteStockFinancialsTable(t *testing.T) {
+	t.Parallel()
+	fin := financialsTestFixture()
 	var buf bytes.Buffer
 	if err := WriteStockFinancials(&buf, FormatTable, fin); err != nil {
 		t.Fatalf("WriteStockFinancials error: %v", err)
@@ -56,5 +62,66 @@ func TestWriteStockFinancialsTable(t *testing.T) {
 		if !strings.Contains(out, want) {
 			t.Fatalf("output missing %q\nfull:\n%s", want, out)
 		}
+	}
+}
+
+func TestWriteStockFinancialsCSV(t *testing.T) {
+	t.Parallel()
+	fin := financialsTestFixture()
+	var buf bytes.Buffer
+	if err := WriteStockFinancials(&buf, FormatCSV, fin); err != nil {
+		t.Fatalf("WriteStockFinancials CSV error: %v", err)
+	}
+	// Parse the CSV back
+	reader := csv.NewReader(&buf)
+	rows, err := reader.ReadAll()
+	if err != nil {
+		t.Fatalf("CSV parse error: %v", err)
+	}
+	if len(rows) < 4 {
+		t.Fatalf("expected at least header + 3 rows, got %d", len(rows))
+	}
+	if rows[0][0] != "section" {
+		t.Fatalf("expected first header col 'section', got %q", rows[0][0])
+	}
+	// Find one row per section to verify all three discriminators appear
+	sections := map[string]bool{}
+	for _, r := range rows[1:] {
+		sections[r[0]] = true
+	}
+	for _, want := range []string{"revenue", "operating_income", "stability"} {
+		if !sections[want] {
+			t.Fatalf("CSV missing section %q; sections=%v", want, sections)
+		}
+	}
+}
+
+func TestWriteStockFinancialsJSON(t *testing.T) {
+	t.Parallel()
+	fin := financialsTestFixture()
+	var buf bytes.Buffer
+	if err := WriteStockFinancials(&buf, FormatJSON, fin); err != nil {
+		t.Fatalf("WriteStockFinancials JSON error: %v", err)
+	}
+	// Roundtrip
+	var got domain.StockFinancials
+	if err := json.Unmarshal(buf.Bytes(), &got); err != nil {
+		t.Fatalf("JSON unmarshal failed: %v\noutput:\n%s", err, buf.String())
+	}
+	if got.ProductCode != fin.ProductCode {
+		t.Fatalf("product_code roundtrip mismatch: %q vs %q", got.ProductCode, fin.ProductCode)
+	}
+	if got.Stability.Position != fin.Stability.Position {
+		t.Fatalf("stability.position roundtrip mismatch")
+	}
+	if len(got.Revenue.Graph) != len(fin.Revenue.Graph) {
+		t.Fatalf("revenue.graph length mismatch: %d vs %d", len(got.Revenue.Graph), len(fin.Revenue.Graph))
+	}
+	// Also verify snake_case in raw JSON
+	if !strings.Contains(buf.String(), `"product_code"`) {
+		t.Fatalf("expected snake_case product_code in JSON, got:\n%s", buf.String())
+	}
+	if !strings.Contains(buf.String(), `"liability_ratio"`) {
+		t.Fatalf("expected snake_case liability_ratio in JSON")
 	}
 }

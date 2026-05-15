@@ -111,6 +111,20 @@ func formatUSD(v float64) string {
 	return s
 }
 
+// formatUSDLarge formats large USD values with thousand separators, e.g.
+// 3092000000 → "$3,092,000,000".
+func formatUSDLarge(v float64) string {
+	neg := v < 0
+	if neg {
+		v = -v
+	}
+	s := "$" + formatWithCommas(int64(v))
+	if neg {
+		return "-" + s
+	}
+	return s
+}
+
 func formatPct(v float64) string {
 	return fmt.Sprintf("%.2f%%", v*100)
 }

@@ -126,17 +126,3 @@ func WriteStockFinancials(w io.Writer, format Format, fin domain.StockFinancials
 		return fmt.Errorf("unsupported output format: %s", format)
 	}
 }
-
-// formatUSDLarge formats large USD values with thousand separators, e.g.
-// 3092000000 → "$3,092,000,000".
-func formatUSDLarge(v float64) string {
-	neg := v < 0
-	if neg {
-		v = -v
-	}
-	s := "$" + formatWithCommas(int64(v))
-	if neg {
-		return "-" + s
-	}
-	return s
-}
