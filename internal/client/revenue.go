@@ -29,6 +29,9 @@ func (c *Client) GetSalesComposition(ctx context.Context, symbol string) (domain
 	if err != nil {
 		return domain.SalesComposition{}, err
 	}
+	// Pass productCode (not symbol) to avoid a second search round-trip:
+	// resolveCompanyCode → GetCompanyOverview → resolveProductCode short-circuits
+	// when the input already looks like a productCode.
 	companyCode, err := c.resolveCompanyCode(ctx, productCode)
 	if err != nil {
 		return domain.SalesComposition{}, err
