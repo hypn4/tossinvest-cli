@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"sort"
+	"strings"
 
 	"github.com/junghoonkye/tossinvest-cli/internal/domain"
 )
@@ -142,7 +143,34 @@ func writePositionsTable(w io.Writer, positions []domain.Position) error {
 		rows = append(rows, row)
 	}
 
-	return renderTable(w, headers, rows)
+	if err := renderTable(w, headers, rows); err != nil {
+		return err
+	}
+
+	// Footer notes for fees and notices
+	for _, p := range positions {
+		if p.EstimatedCommission == 0 && p.EstimatedTax == 0 && !p.Delisting && !p.NoticeSplitMerge && !p.NoticeEarningsAnnouncement {
+			continue
+		}
+		notes := []string{}
+		if p.EstimatedCommission != 0 {
+			notes = append(notes, fmt.Sprintf("수수료 추정 %s (%.3f%%)", formatKRW(p.EstimatedCommission), p.CommissionRate*100))
+		}
+		if p.EstimatedTax != 0 {
+			notes = append(notes, fmt.Sprintf("세금 추정 %s (%.3f%%)", formatKRW(p.EstimatedTax), p.TaxRate*100))
+		}
+		if p.Delisting {
+			notes = append(notes, "상장폐지 예정")
+		}
+		if p.NoticeSplitMerge {
+			notes = append(notes, "액면분할/합병 공지")
+		}
+		if p.NoticeEarningsAnnouncement {
+			notes = append(notes, "실적 발표 예정")
+		}
+		fmt.Fprintf(w, "  · %s: %s\n", p.Symbol, strings.Join(notes, " · "))
+	}
+	return nil
 }
 
 func sortedMarketKeys(markets map[string]domain.AccountMarketSummary) []string {
