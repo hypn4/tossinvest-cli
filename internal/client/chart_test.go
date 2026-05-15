@@ -121,6 +121,30 @@ func TestGetChartFromFixture(t *testing.T) {
 	}
 }
 
+func TestChartProductPrefix_OptionRoutesToUSO(t *testing.T) {
+	cases := []struct {
+		name        string
+		marketCode  string
+		productCode string
+		want        string
+	}{
+		{"OPT_ with NSQ market", "NSQ", "OPT_SNDK260515C01395000_20260506", "us-o"},
+		{"OPT_ with empty market", "", "OPT_SNDK260515C01395000_20260506", "us-o"},
+		{"NAS stock unaffected", "NSQ", "NAS0250224006", "us-s"},
+		{"KR stock unaffected", "KSP", "A005930", "kr-s"},
+	}
+	for _, c := range cases {
+		c := c
+		t.Run(c.name, func(t *testing.T) {
+			t.Parallel()
+			got := chartProductPrefix(c.marketCode, c.productCode)
+			if got != c.want {
+				t.Fatalf("chartProductPrefix(%q,%q)=%q; want %q", c.marketCode, c.productCode, got, c.want)
+			}
+		})
+	}
+}
+
 func TestStreamChartEmitsIntraBucketAndNewBucket(t *testing.T) {
 	t.Parallel()
 
