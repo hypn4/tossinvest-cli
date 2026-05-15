@@ -107,6 +107,7 @@ func newRootCmd() *cobra.Command {
 		newSignalsCmd(opts),
 		newStockCmd(opts),
 		newOrderableCmd(opts),
+		newOptionsCmd(opts),
 		newMyCmd(opts),
 		newOrderCmd(opts),
 		newExportCmd(opts),
