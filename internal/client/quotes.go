@@ -88,6 +88,57 @@ func assembleLevels(prices, pricesKrw, volumes []float64) []domain.OrderBookLeve
 	return out
 }
 
-// Suppress "imported and not used" errors while later tasks add GetTicks; remove later.
-var _ = strconv.Itoa
-var _ = url.Parse
+type tickEnvelope struct {
+	Result []struct {
+		Time             string  `json:"time"`
+		Code             string  `json:"code"`
+		Price            float64 `json:"price"`
+		PriceKrw         float64 `json:"priceKrw"`
+		Base             float64 `json:"base"`
+		BaseKrw          float64 `json:"baseKrw"`
+		Volume           float64 `json:"volume"`
+		TradeType        string  `json:"tradeType"`
+		CumulativeVolume float64 `json:"cumulativeVolume"`
+	} `json:"result"`
+}
+
+// GetTicks returns up to count recent trade ticks newest-first.
+func (c *Client) GetTicks(ctx context.Context, symbol string, count int) ([]domain.Tick, error) {
+	productCode, err := c.resolveProductCode(ctx, symbol)
+	if err != nil {
+		return nil, err
+	}
+	if count <= 0 {
+		count = 50
+	}
+
+	endpoint, err := url.Parse(fmt.Sprintf("%s/api/v2/stock-prices/%s/ticks", c.infoBaseURL, productCode))
+	if err != nil {
+		return nil, err
+	}
+	q := endpoint.Query()
+	q.Set("count", strconv.Itoa(count))
+	endpoint.RawQuery = q.Encode()
+
+	var envelope tickEnvelope
+	if err := c.getJSON(ctx, endpoint.String(), &envelope); err != nil {
+		return nil, err
+	}
+
+	out := make([]domain.Tick, 0, len(envelope.Result))
+	fetchedAt := time.Now().UTC()
+	for _, raw := range envelope.Result {
+		out = append(out, domain.Tick{
+			Time:             raw.Time,
+			ProductCode:      raw.Code,
+			Price:            raw.Price,
+			PriceKRW:         raw.PriceKrw,
+			Base:             raw.Base,
+			Volume:           raw.Volume,
+			TradeType:        raw.TradeType,
+			CumulativeVolume: raw.CumulativeVolume,
+			FetchedAt:        fetchedAt,
+		})
+	}
+	return out, nil
+}
