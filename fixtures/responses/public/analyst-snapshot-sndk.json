@@ -1,0 +1,30 @@
+{
+  "opinion": {
+    "result": {
+      "type": "BUY",
+      "strongSell": 0, "sell": 0, "hold": 4, "buy": 12, "strongBuy": 6,
+      "targetPrice": {"USD": 1224.42, "KRW": 1794999.72},
+      "description": "애널리스트 22명 중 18명이 구매 의견을 냈어요."
+    }
+  },
+  "consensus": {
+    "result": {
+      "targetPrice": {
+        "stockCode": "NAS0250224006",
+        "mean": 1224.42, "meanKrw": 1794999.72,
+        "high": 2000.0, "highKrw": 2932000.0,
+        "low": 250.0, "lowKrw": 366500.0,
+        "currency": "USD"
+      },
+      "pointDate": "2026-05-15",
+      "pastClosePrices": [
+        {"price": 1405.85, "priceKrw": 2097247, "date": "2026-05-15"},
+        {"price": 1096.51, "priceKrw": 1635773, "date": "2026-04-30"},
+        {"price": 635.34, "priceKrw": 947800, "date": "2026-03-31"}
+      ]
+    }
+  },
+  "reports": {
+    "result": {"analystReportGroups": []}
+  }
+}

@@ -177,6 +177,33 @@ Examples:
 		},
 	}
 
-	cmd.AddCommand(infoCmd, overviewCmd, indicatorsCmd, valuationCmd, revenueCmd, peersCmd)
+	analystCmd := &cobra.Command{
+		Use:   "analyst <symbol>",
+		Short: "Analyst BUY/HOLD/SELL counts + consensus target + reports",
+		Long: `Fetch the analyst opinion + consensus target price + report list.
+
+Stitches three endpoints:
+  - /api/v1/stock-detail/ui/wts/{code}/analyst-opinion
+  - /api/v2/stock-infos/consensus/{code}
+  - /api/v1/stock-detail/ui/wts/{code}/analyst-reports
+
+Examples:
+  tossctl stock analyst SNDK
+  tossctl stock analyst NAS0250224006 --output json`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			app, err := newAppContext(opts)
+			if err != nil {
+				return err
+			}
+			snap, err := app.client.GetAnalystSnapshot(cmd.Context(), args[0])
+			if err != nil {
+				return userFacingCommandError(err)
+			}
+			return output.WriteAnalystSnapshot(cmd.OutOrStdout(), app.format, snap)
+		},
+	}
+
+	cmd.AddCommand(infoCmd, overviewCmd, indicatorsCmd, valuationCmd, revenueCmd, peersCmd, analystCmd)
 	return cmd
 }

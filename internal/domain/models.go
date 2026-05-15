@@ -570,3 +570,48 @@ type TICSRanking struct {
 	DisplayValue string  `json:"displayValue"`
 	Value        float64 `json:"value"`
 }
+
+type AnalystSnapshot struct {
+	ProductCode string          `json:"productCode"`
+	Opinion     AnalystOpinion  `json:"opinion"`
+	Consensus   ConsensusTarget `json:"consensus"`
+	Reports     []AnalystReport `json:"reports"`
+	FetchedAt   time.Time       `json:"fetchedAt"`
+}
+
+type AnalystOpinion struct {
+	Type        string  `json:"type"`        // BUY|HOLD|SELL
+	StrongBuy   int     `json:"strongBuy"`
+	Buy         int     `json:"buy"`
+	Hold        int     `json:"hold"`
+	Sell        int     `json:"sell"`
+	StrongSell  int     `json:"strongSell"`
+	TargetUSD   float64 `json:"targetUSD"`
+	TargetKRW   float64 `json:"targetKRW"`
+	Description string  `json:"description"`
+}
+
+type ConsensusTarget struct {
+	Mean       float64              `json:"mean"`
+	High       float64              `json:"high"`
+	Low        float64              `json:"low"`
+	MeanKRW    float64              `json:"meanKRW"`
+	HighKRW    float64              `json:"highKRW"`
+	LowKRW     float64              `json:"lowKRW"`
+	Currency   string               `json:"currency"`
+	PointDate  string               `json:"pointDate"`
+	PastCloses []ConsensusPastClose `json:"pastCloses"`
+}
+
+type ConsensusPastClose struct {
+	Date     string  `json:"date"`
+	Price    float64 `json:"price"`
+	PriceKRW float64 `json:"priceKRW"`
+}
+
+type AnalystReport struct {
+	Title  string `json:"title"`
+	Source string `json:"source"`
+	Date   string `json:"date"`
+	URL    string `json:"url,omitempty"`
+}

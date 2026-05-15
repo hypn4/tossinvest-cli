@@ -129,6 +129,11 @@
       "file": "tics-sndk.json",
       "url": "https://wts-info-api.tossinvest.com/api/v2/companies/NAS116LTR-E0/tics",
       "method": "GET"
+    },
+    {
+      "file": "analyst-snapshot-sndk.json",
+      "url": "(combined opinion+consensus+reports fixture for testing only)",
+      "method": "GET"
     }
   ]
 }
