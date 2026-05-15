@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+- `tossctl quotes book <sym>` — 토스 호가창 조회. KR 종목은 10단계, US 종목은 Top-of-book.
+- `tossctl quotes ticks <sym>` — 최근 체결 틱 스냅샷 (`--count 50` 기본). `--follow` 옵션으로 NDJSON 스트림 (cumulativeVolume 으로 자동 dedup, `--interval 2s`, `--since <cumvol>` 옵션). 참고: docs/reverse-engineering/order-page-deep-dive.md §3.4-3.5.
+
 ## [0.4.14] - 2026-05-14
 
 ### Changed
