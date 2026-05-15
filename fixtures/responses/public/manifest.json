@@ -159,6 +159,11 @@
       "file": "stock-statements-sndk-inc-q.json",
       "url": "https://wts-info-api.tossinvest.com/api/v2/companies/NAS0250224006/financial-statement-records",
       "method": "POST"
+    },
+    {
+      "file": "stock-ratios-sndk-debt-q.json",
+      "url": "https://wts-info-api.tossinvest.com/api/v2/companies/NAS0250224006/financial-statements/comprehensive",
+      "method": "POST"
     }
   ]
 }

@@ -824,3 +824,30 @@ type StatementLineItem struct {
 	Unit       string   `json:"unit,omitempty"` // USD, KRW, etc
 	Value      *float64 `json:"value"`          // null when not reported
 }
+
+type StockRatios struct {
+	ProductCode string          `json:"product_code"`
+	Factor      RatioFactor     `json:"factor"`      // DEBT_RATIO|CURRENT_RATIO|INTEREST_COVERAGE_RATIO
+	Period      string          `json:"period"`      // Q|Y
+	RangeLabel  string          `json:"range_label"` // 1년|3년|5년|전체
+	Items       []RatioLineItem `json:"items"`
+	FetchedAt   time.Time       `json:"fetched_at"`
+}
+
+type RatioFactor struct {
+	Code        string `json:"code"`
+	DisplayName string `json:"display_name"`
+}
+
+type RatioLineItem struct {
+	Code   string       `json:"code"`  // e.g. TOTAL_SHAREHOLDERS_EQUITY
+	Unit   string       `json:"unit"`  // AMOUNT|PERCENT
+	Name   string       `json:"name"`  // 총자본
+	Values []RatioValue `json:"values"`
+}
+
+type RatioValue struct {
+	Period   string  `json:"period"`
+	Value    float64 `json:"value"`
+	ValueKrw float64 `json:"value_krw,omitempty"`
+}

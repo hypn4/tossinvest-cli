@@ -1,0 +1,58 @@
+{
+  "result": {
+    "selectedFactor": {"code": "DEBT_RATIO", "displayName": "부채비율"},
+    "selectableFactors": [
+      {"code": "DEBT_RATIO", "displayName": "부채비율"},
+      {"code": "CURRENT_RATIO", "displayName": "유동비율"},
+      {"code": "INTEREST_COVERAGE_RATIO", "displayName": "이자보상비율"}
+    ],
+    "selectedRange": {"code": 3, "displayName": "3년"},
+    "selectableRanges": [
+      {"code": 1, "displayName": "1년"},
+      {"code": 3, "displayName": "3년"},
+      {"code": 5, "displayName": "5년"},
+      {"code": 2147483647, "displayName": "전체"}
+    ],
+    "selectedPeriod": {"code": "Q", "displayName": "분기"},
+    "selectablePeriods": [
+      {"code": "Q", "displayName": "분기"},
+      {"code": "Y", "displayName": "연간"}
+    ],
+    "graph": [
+      {
+        "code": "TOTAL_SHAREHOLDERS_EQUITY",
+        "unit": "AMOUNT",
+        "name": "총자본",
+        "values": [
+          {"period": "2025-06", "value": 11082000000.0, "valueKrw": 15395114400000.0},
+          {"period": "2025-09", "value": 12200000000.0, "valueKrw": 17142800000000.0},
+          {"period": "2025-12", "value": 13100000000.0, "valueKrw": 19207320000000.0},
+          {"period": "2026-03", "value": 16700000000.0, "valueKrw": 25382120000000.0}
+        ]
+      },
+      {
+        "code": "TOTAL_LIABILITIES",
+        "unit": "AMOUNT",
+        "name": "총부채",
+        "values": [
+          {"period": "2025-06", "value": 5200000000.0, "valueKrw": 7223840000000.0},
+          {"period": "2025-09", "value": 4800000000.0, "valueKrw": 6745920000000.0},
+          {"period": "2025-12", "value": 4500000000.0, "valueKrw": 6597000000000.0},
+          {"period": "2026-03", "value": 0.0, "valueKrw": 0.0}
+        ]
+      },
+      {
+        "code": "DEBT_RATIO",
+        "unit": "PERCENT",
+        "name": "부채비율",
+        "values": [
+          {"period": "2025-06", "value": 46.92, "valueKrw": 0.0},
+          {"period": "2025-09", "value": 39.34, "valueKrw": 0.0},
+          {"period": "2025-12", "value": 34.35, "valueKrw": 0.0},
+          {"period": "2026-03", "value": 0.0, "valueKrw": 0.0}
+        ]
+      }
+    ],
+    "table": []
+  }
+}
