@@ -104,3 +104,23 @@ func TestWriteTicksTable(t *testing.T) {
 		t.Fatalf("expected first tick time in table: %s", buf.String())
 	}
 }
+
+func TestWriteTickNDJSON(t *testing.T) {
+	var buf bytes.Buffer
+	for _, tick := range sampleTicks {
+		if err := WriteTickNDJSON(&buf, tick); err != nil {
+			t.Fatalf("error: %v", err)
+		}
+	}
+	lines := strings.Split(strings.TrimRight(buf.String(), "\n"), "\n")
+	if len(lines) != 2 {
+		t.Fatalf("expected 2 NDJSON lines, got %d", len(lines))
+	}
+	var first domain.Tick
+	if err := json.Unmarshal([]byte(lines[0]), &first); err != nil {
+		t.Fatalf("first line not valid JSON: %v", err)
+	}
+	if first.CumulativeVolume != 1731781 {
+		t.Fatalf("unexpected first tick: %+v", first)
+	}
+}

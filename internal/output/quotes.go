@@ -113,6 +113,21 @@ func WriteTicks(w io.Writer, format Format, ticks []domain.Tick) error {
 	}
 }
 
+// WriteTickNDJSON writes a single tick as a single JSON object terminated by '\n'.
+// Newline-delimited JSON is what consumers (jq, LLM pipelines) expect from
+// `tossctl quotes ticks --follow`.
+func WriteTickNDJSON(w io.Writer, tick domain.Tick) error {
+	data, err := json.Marshal(tick)
+	if err != nil {
+		return err
+	}
+	if _, err := w.Write(data); err != nil {
+		return err
+	}
+	_, err = w.Write([]byte{'\n'})
+	return err
+}
+
 func labelFor(symbol, name, productCode string) string {
 	if symbol != "" && name != "" && symbol != name {
 		return fmt.Sprintf("%s — %s", symbol, name)
