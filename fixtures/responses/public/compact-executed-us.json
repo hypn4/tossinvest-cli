@@ -1,0 +1,36 @@
+{
+  "result": {
+    "pagingParam": {
+      "from": "2021-01-01T00:00:00+09:00",
+      "to":   "2026-05-15T21:09:41+09:00",
+      "cursorKey": null
+    },
+    "body": [
+      {
+        "productCode": "US20100311002",
+        "tradeType": "buy",
+        "executionAvgKrwPrice": 277505.50,
+        "executionTotalKrwPrice": 5550110,
+        "executionTotalKrwAmount": 5550110,
+        "executionAvgLocalPrice": 185.61,
+        "executionTotalLocalPrice": 3712.20,
+        "executionTotalLocalAmount": 3712.20,
+        "quantity": 20.0,
+        "executedTimeBucket": "2026-05-15T02:00:00+09:00"
+      },
+      {
+        "productCode": "US20100311002",
+        "tradeType": "sell",
+        "executionAvgKrwPrice": 282992.49,
+        "executionTotalKrwPrice": 9904737,
+        "executionTotalKrwAmount": 9904737,
+        "executionAvgLocalPrice": 189.28,
+        "executionTotalLocalPrice": 6624.80,
+        "executionTotalLocalAmount": 6624.80,
+        "quantity": 35.0,
+        "executedTimeBucket": "2026-05-15T00:00:00+09:00"
+      }
+    ],
+    "lastPage": true
+  }
+}
