@@ -1,6 +1,7 @@
 package output
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -18,19 +19,21 @@ func WriteStockIndicators(w io.Writer, format Format, ind domain.StockIndicators
 		enc.SetIndent("", "  ")
 		return enc.Encode(ind)
 	case FormatCSV:
-		if _, err := fmt.Fprintln(w, "section,key,value"); err != nil {
+		cw := csv.NewWriter(w)
+		if err := cw.Write([]string{"section", "key", "value"}); err != nil {
 			return err
 		}
 		names := sortedSectionNames(ind.Sections)
 		for _, name := range names {
 			keys := sortedMapKeys(ind.Sections[name])
 			for _, k := range keys {
-				if _, err := fmt.Fprintf(w, "%s,%s,%v\n", name, k, ind.Sections[name][k]); err != nil {
+				if err := cw.Write([]string{name, k, fmt.Sprintf("%v", ind.Sections[name][k])}); err != nil {
 					return err
 				}
 			}
 		}
-		return nil
+		cw.Flush()
+		return cw.Error()
 	case FormatTable:
 		if _, err := fmt.Fprintf(w, "%s — investment indicators\n", ind.ProductCode); err != nil {
 			return err

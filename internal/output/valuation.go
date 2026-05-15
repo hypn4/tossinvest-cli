@@ -1,9 +1,11 @@
 package output
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io"
+	"strconv"
 
 	"github.com/junghoonkye/tossinvest-cli/internal/domain"
 )
@@ -16,15 +18,17 @@ func WriteStockValuation(w io.Writer, format Format, val domain.StockValuation) 
 		enc.SetIndent("", "  ")
 		return enc.Encode(val)
 	case FormatCSV:
-		if _, err := fmt.Fprintln(w, "product_code,name,factor,value,period,is_self"); err != nil {
+		cw := csv.NewWriter(w)
+		if err := cw.Write([]string{"product_code", "name", "factor", "value", "period", "is_self"}); err != nil {
 			return err
 		}
 		for _, p := range val.Peers {
-			if _, err := fmt.Fprintf(w, "%s,%s,%s,%.2f,%s,%t\n", p.ProductCode, p.Name, val.Factor, p.Value, p.Period, p.IsSelf); err != nil {
+			if err := cw.Write([]string{p.ProductCode, p.Name, val.Factor, fmt.Sprintf("%.2f", p.Value), p.Period, strconv.FormatBool(p.IsSelf)}); err != nil {
 				return err
 			}
 		}
-		return nil
+		cw.Flush()
+		return cw.Error()
 	case FormatTable:
 		if _, err := fmt.Fprintf(w, "%s — valuation snapshot\n", val.ProductCode); err != nil {
 			return err

@@ -1,6 +1,7 @@
 package output
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -16,15 +17,17 @@ func WriteSalesComposition(w io.Writer, format Format, sc domain.SalesCompositio
 		enc.SetIndent("", "  ")
 		return enc.Encode(sc)
 	case FormatCSV:
-		if _, err := fmt.Fprintln(w, "business,product,ratio"); err != nil {
+		cw := csv.NewWriter(w)
+		if err := cw.Write([]string{"business", "product", "ratio"}); err != nil {
 			return err
 		}
 		for _, it := range sc.Items {
-			if _, err := fmt.Fprintf(w, "%s,%s,%.2f\n", it.Business, it.Product, it.Ratio); err != nil {
+			if err := cw.Write([]string{it.Business, it.Product, fmt.Sprintf("%.2f", it.Ratio)}); err != nil {
 				return err
 			}
 		}
-		return nil
+		cw.Flush()
+		return cw.Error()
 	case FormatTable:
 		if _, err := fmt.Fprintf(w, "%s — 매출 구성 (FY%d, ending %s)\n", sc.ProductCode, sc.FiscalYear, sc.EndDate); err != nil {
 			return err
