@@ -159,6 +159,13 @@ Toss web does **not** stream prices over WebSocket or SSE. Realtime is `(SSE thi
 
 Polling these directly produces a complete realtime view without needing the SSE channel; the SSE channel is mostly used to invalidate **own portfolio/orders** state, not market data.
 
+**CLI mappings (added in PR5):**
+- `Last/OHLC/체결강도/marketCap` → `tossctl quote get --follow` (default 3s)
+- `Orderbook` → `tossctl quotes book --follow` (default 1s)
+- `Recent ticks` → `tossctl quotes ticks --follow` (default 2s)
+- `Intraday candle` → `tossctl chart get --tf <1m|5m|15m|...> --follow` (default 60s)
+- `Push triggers` → `tossctl push listen`
+
 ## Indicators / Signals
 
 Toss does **not** expose server-computed technical indicators (MA / RSI / MACD / Bollinger). The pro chart computes everything client-side from `/c-chart` OHLCV. User-side chart layout/state is persisted at `/api/v1/properties/member/{prochart-setting,multi-prochart-setting,mts-prochart-setting}`.

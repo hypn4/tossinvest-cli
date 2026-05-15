@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- `tossctl chart get --follow` — NDJSON candle stream with per-`dt` `(close, volume)` dedup. Default `--interval 60s`, `--count` capped at 5 (defaults to 2) when streaming.
+- `tossctl quotes book --follow` — NDJSON orderbook stream emitting on any change to the hash of `(offerPrices, offerVolumes, bidPrices, bidVolumes)`. Default `--interval 1s`.
+- `tossctl quote get --follow` — NDJSON quote stream emitting on `(last, volume)` change. Default `--interval 3s`.
 - `tossctl quotes book <sym>` — 토스 호가창 조회. KR 종목은 10단계, US 종목은 Top-of-book.
 - `tossctl quotes ticks <sym>` — 최근 체결 틱 스냅샷 (`--count 50` 기본). `--follow` 옵션으로 NDJSON 스트림 (cumulativeVolume 으로 자동 dedup, `--interval 2s`, `--since <cumvol>` 옵션). 참고: docs/reverse-engineering/order-page-deep-dive.md §3.4-3.5.
 - `tossctl signals list <sym>...` — 토스 AI 시그널 한 줄 사유 배치 조회 (`reasoningDescription`).
@@ -16,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - `tossctl my fills <sym> [--tf thirty_minute]` — 본인 체결 내역을 30분 (또는 토스 지원 timeUnit) 버킷으로 출력. 차트 오버레이 용도.
 
 ### Changed
+- `cmd/tossctl/chart.go`, `cmd/tossctl/quotes.go`, `cmd/tossctl/quote.go` long help text now documents that `--follow` is REST polling (no SSE/WebSocket from Toss) and that closed-market silence is correct behavior.
 - `tossctl portfolio` 가 `tradableQuantity`, `unsettledQuantity`, `evaluatedAmountAfterFees`, `profitLossAmountAfterFees`, `commission` (+ `commissionRate`), `tax` (+ `taxRate`), `delisting`, `nxtSupported`, `notice.{splitMerge,earningsAnnouncement}` 까지 노출. JSON 키는 모두 신규 — 기존 키는 그대로 유지되어 backward compatible.
 
 ## [0.4.14] - 2026-05-14
