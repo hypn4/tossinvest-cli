@@ -234,6 +234,40 @@ Examples:
 		},
 	}
 
-	cmd.AddCommand(infoCmd, overviewCmd, indicatorsCmd, valuationCmd, revenueCmd, peersCmd, analystCmd, financialsCmd)
+	var dividendsAllHistory bool
+	dividendsCmd := &cobra.Command{
+		Use:   "dividends <symbol>",
+		Short: "Dividend snapshot (TTM yield, recent payouts, optional full history)",
+		Long: `Fetch dividend-related endpoints behind the 종목정보 DIVIDEND section.
+
+Stitches three GET endpoints:
+  - /api/v1/stock-infos/{code}/dividends/yield-ratio/histories — TTM summary card
+  - /api/v1/stock-infos/dividend/{code}/years    — recent-range payouts (3-year default)
+  - /api/v1/stock-infos/dividend/{code}/summary  — full historical payout list
+
+For non-paying stocks all three return empty; the table mode prints
+"No dividends recorded for this stock." JSON output always includes the
+full history; CSV honors --all-history.
+
+Examples:
+  tossctl stock dividends AAPL
+  tossctl stock dividends AAPL --all-history
+  tossctl stock dividends NAS0250224006 --output json`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			app, err := newAppContext(opts)
+			if err != nil {
+				return err
+			}
+			div, err := app.client.GetStockDividends(cmd.Context(), args[0])
+			if err != nil {
+				return userFacingCommandError(err)
+			}
+			return output.WriteStockDividends(cmd.OutOrStdout(), app.format, div, dividendsAllHistory)
+		},
+	}
+	dividendsCmd.Flags().BoolVar(&dividendsAllHistory, "all-history", false, "Include the full historical payout list in table/CSV output")
+
+	cmd.AddCommand(infoCmd, overviewCmd, indicatorsCmd, valuationCmd, revenueCmd, peersCmd, analystCmd, financialsCmd, dividendsCmd)
 	return cmd
 }
