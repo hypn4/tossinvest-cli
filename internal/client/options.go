@@ -229,13 +229,34 @@ type optionPricesEnvelope struct {
 	} `json:"result"`
 }
 
+// optionPricesBatchSize caps codes per /api/v2/stock-prices call. Toss web
+// batches ~58 codes; we use 50 to stay well under any URL-length / proxy
+// limits (each OPT_ code is ~32 chars; 50 × 32 plus separators ≈ 1.6 KB).
+const optionPricesBatchSize = 50
+
 // GetOptionPrices fetches the bulk price list for a slice of productCodes
-// (typically OPT_ codes but also works for stocks). The URL encodes codes as
-// a comma-separated `codes` parameter, matching what the chain UI sends.
+// (typically OPT_ codes but also works for stocks). Large code lists are
+// chunked into batches of optionPricesBatchSize to stay within URL limits.
 func (c *Client) GetOptionPrices(ctx context.Context, codes []string) ([]domain.OptionPrice, error) {
 	if len(codes) == 0 {
 		return nil, fmt.Errorf("GetOptionPrices: codes is empty")
 	}
+	out := make([]domain.OptionPrice, 0, len(codes))
+	for start := 0; start < len(codes); start += optionPricesBatchSize {
+		end := start + optionPricesBatchSize
+		if end > len(codes) {
+			end = len(codes)
+		}
+		batch, err := c.getOptionPricesBatch(ctx, codes[start:end])
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, batch...)
+	}
+	return out, nil
+}
+
+func (c *Client) getOptionPricesBatch(ctx context.Context, codes []string) ([]domain.OptionPrice, error) {
 	endpoint, err := url.Parse(fmt.Sprintf("%s/api/v2/stock-prices", c.infoBaseURL))
 	if err != nil {
 		return nil, err

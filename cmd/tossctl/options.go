@@ -28,9 +28,13 @@ Once you have an OPT_ productCode, the existing tossctl commands all work:
   tossctl quotes  ticks OPT_...   [--follow]
   tossctl chart   get   OPT_... --tf 15m   (auto-routes to us-o chart family)
 
-Use 'options nearest-atm <symbol>' to discover the OPT_ code for an
-underlying's nearest-expiry at-the-money option. The full strike+expiry
-chain enumeration endpoint has not yet been reverse-engineered.`,
+Discovery commands:
+  options expiries <sym>             — list all expiry dates for an underlying
+  options chain <sym> [--expiry] [--with-prices] [--type call|put]
+                                     — full strike chain (call + put per row)
+  options nearest-atm <sym>          — OPT_ code for the nearest-expiry ATM option
+  options prices <code> [<code>...]  — bulk option/stock prices (lighter than quote get)
+  options info <OPT_…>               — single-option metadata (strike/OI/bid-ask/halt)`,
 	}
 
 	infoCmd := &cobra.Command{
