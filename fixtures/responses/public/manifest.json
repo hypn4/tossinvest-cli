@@ -39,6 +39,21 @@
       "file": "ticks-us.json",
       "url": "https://wts-info-api.tossinvest.com/api/v2/stock-prices/US20100311002/ticks?count=3",
       "method": "GET"
+    },
+    {
+      "file": "signals-batch.json",
+      "url": "https://wts-info-api.tossinvest.com/api/v1/dashboard/wts/overview/ai-signals",
+      "method": "POST"
+    },
+    {
+      "file": "signals-detail.json",
+      "url": "https://wts-info-api.tossinvest.com/api/v1/dashboard/wts/overview/ai-signals/detail?productCode=US20190226001&productType=STOCKS",
+      "method": "GET"
+    },
+    {
+      "file": "signals-events.json",
+      "url": "https://wts-info-api.tossinvest.com/api/v2/dashboard/wts/overview/signals",
+      "method": "POST"
     }
   ]
 }

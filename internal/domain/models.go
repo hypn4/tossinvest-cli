@@ -270,3 +270,49 @@ type Tick struct {
 	CumulativeVolume float64   `json:"cumulative_volume"`
 	FetchedAt        time.Time `json:"fetched_at,omitempty"`
 }
+
+type Signal struct {
+	ProductCode          string `json:"product_code"`
+	ReasoningDescription string `json:"reasoning_description"`
+}
+
+type SignalNews struct {
+	ID         string    `json:"id"`
+	Source     string    `json:"source"`
+	AgencyName string    `json:"agency_name"`
+	Title      string    `json:"title"`
+	FaviconURL string    `json:"favicon_url,omitempty"`
+	CreatedAt  time.Time `json:"created_at,omitempty"`
+}
+
+type RelatedSignal struct {
+	AssetCode   string   `json:"asset_code"`
+	AssetName   string   `json:"asset_name"`
+	StockCode   string   `json:"stock_code,omitempty"`
+	StockSymbol string   `json:"stock_symbol,omitempty"`
+	Relation    string   `json:"relation,omitempty"`
+	Description []string `json:"description,omitempty"`
+}
+
+type SignalDetail struct {
+	ProductCode      string          `json:"product_code"`
+	AssetName        string          `json:"asset_name,omitempty"`
+	SignalID         string          `json:"signal_id,omitempty"`
+	SignalDirection  int             `json:"signal_direction"` // 1 bullish, -1 bearish
+	CreatedAt        time.Time       `json:"created_at,omitempty"`
+	Description      string          `json:"description"`
+	DescriptionItems []string        `json:"description_items,omitempty"`
+	ProfitLossRate   float64         `json:"profit_loss_rate,omitempty"`
+	News             []SignalNews    `json:"news,omitempty"`
+	Keywords         []string        `json:"keywords,omitempty"`
+	Related          []RelatedSignal `json:"related,omitempty"`
+	FetchedAt        time.Time       `json:"fetched_at"`
+}
+
+type EventSignal struct {
+	ProductCode string    `json:"product_code"`
+	SignalLabel string    `json:"signal_label"` // e.g. "소식"
+	SignalInfo  string    `json:"signal_info"`  // e.g. "실적이 발표됐어요. ..."
+	SignalID    int64     `json:"signal_id"`
+	DateTime    time.Time `json:"datetime"`
+}

@@ -257,6 +257,12 @@ func (c *Client) resolveProductCode(ctx context.Context, symbol string) (string,
 	return envelope.Result.Stocks[0].StockCode, nil
 }
 
+// ResolveProductCode is the public wrapper for callers (CLI commands) that
+// need to convert a user-typed symbol into a Toss product code.
+func (c *Client) ResolveProductCode(ctx context.Context, symbol string) (string, error) {
+	return c.resolveProductCode(ctx, symbol)
+}
+
 func (c *Client) getStockInfo(ctx context.Context, productCode string) (stockInfoResult, error) {
 	var envelope quoteEnvelope[stockInfoResult]
 	if err := c.getJSON(ctx, fmt.Sprintf("%s/api/v2/stock-infos/%s", c.infoBaseURL, productCode), &envelope); err != nil {

@@ -1,0 +1,11 @@
+{
+  "result": {
+    "signals": [
+      {"productCode":"US20190226001","reasoningDescription":"실적 개선 효과"},
+      {"productCode":"US20100311002","reasoningDescription":"차익실현 매도"},
+      {"productCode":"US20100311003","reasoningDescription":"차익실현 매도"},
+      {"productCode":"NAS0230126004","reasoningDescription":"실적 개선 발표"},
+      {"productCode":"US20040819002","reasoningDescription":"AI 투자 확대에 따른 재무 부담"}
+    ]
+  }
+}

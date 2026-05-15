@@ -7,6 +7,11 @@ All notable changes to this project will be documented in this file.
 ### Added
 - `tossctl quotes book <sym>` — 토스 호가창 조회. KR 종목은 10단계, US 종목은 Top-of-book.
 - `tossctl quotes ticks <sym>` — 최근 체결 틱 스냅샷 (`--count 50` 기본). `--follow` 옵션으로 NDJSON 스트림 (cumulativeVolume 으로 자동 dedup, `--interval 2s`, `--since <cumvol>` 옵션). 참고: docs/reverse-engineering/order-page-deep-dive.md §3.4-3.5.
+- `tossctl signals list <sym>...` — 토스 AI 시그널 한 줄 사유 배치 조회 (`reasoningDescription`).
+- `tossctl signals detail <sym>` — 종목별 풀 시그널: 3줄 근거 + 뉴스 헤드라인 (벤징가/로이터 등) + 동일 산업군 관련 종목 + 키워드.
+- `tossctl signals events <sym>...` — 예정/발표된 이벤트 시그널 (실적·공시).
+  세 시그널 명령 모두 `--output json` 으로 LLM/agent 컨텍스트에 그대로 흘리기 좋게 직렬화.
+  데이터 소스: `wts-info-api.tossinvest.com/api/v1/dashboard/wts/overview/ai-signals{,/detail}` 와 `…/api/v2/…/signals`.
 
 ## [0.4.14] - 2026-05-14
 
