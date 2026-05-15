@@ -1,0 +1,33 @@
+{
+  "yieldCard": {
+    "result": {
+      "dividendCount": 0,
+      "dividendMonths": [],
+      "dividendCash": 0,
+      "dividendCashKrw": null,
+      "dividendCashJpy": null,
+      "dividendYieldRatio": 0,
+      "ttmDividendYieldRatio": 0,
+      "ttmDividendMonths": [],
+      "ttmDps": 0.0,
+      "ttmDpsKrw": null,
+      "ttmDpsJpy": null,
+      "ttmDividendTotalCount": 0,
+      "dividendGrowthRatio": null,
+      "currency": null
+    }
+  },
+  "years": {
+    "result": {
+      "startDate": "2023-01-01",
+      "selectedRange": {"code": 3, "displayName": "3년"},
+      "histories": [],
+      "totalCash": 0,
+      "totalCashKrw": 0,
+      "totalCashJpy": 0
+    }
+  },
+  "history": {
+    "result": []
+  }
+}

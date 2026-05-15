@@ -1,0 +1,43 @@
+{
+  "yieldCard": {
+    "result": {
+      "dividendCount": 4,
+      "dividendMonths": [2, 5, 8, 11],
+      "dividendCash": 1.03,
+      "dividendCashKrw": 1536,
+      "dividendCashJpy": 163,
+      "dividendYieldRatio": 0.0035,
+      "ttmDividendYieldRatio": 0.0035,
+      "ttmDividendMonths": ["2025-05", "2025-08", "2025-11", "2026-02"],
+      "ttmDps": 1.04,
+      "ttmDpsKrw": 1551,
+      "ttmDpsJpy": 164,
+      "ttmDividendTotalCount": 4,
+      "dividendGrowthRatio": 0.0179428877941688,
+      "currency": "USD"
+    }
+  },
+  "years": {
+    "result": {
+      "startDate": "2023-01-01",
+      "selectedRange": {"code": 3, "displayName": "3년"},
+      "histories": [
+        {"exDate": "2025-08-11", "paymentDate": "2025-08-15", "currency": "USD", "ratio": 0.0, "cash": 0.26, "cashKrw": 388, "cashJpy": 41, "yieldRatio": 0.0011, "ttmYieldRatio": 0.0044},
+        {"exDate": "2025-11-10", "paymentDate": "2025-11-14", "currency": "USD", "ratio": 0.0, "cash": 0.26, "cashKrw": 388, "cashJpy": 41, "yieldRatio": 0.0011, "ttmYieldRatio": 0.0042},
+        {"exDate": "2026-02-09", "paymentDate": "2026-02-13", "currency": "USD", "ratio": 0.0, "cash": 0.26, "cashKrw": 388, "cashJpy": 41, "yieldRatio": 0.0009, "ttmYieldRatio": 0.0039},
+        {"exDate": "2026-05-09", "paymentDate": "2026-05-15", "currency": "USD", "ratio": 0.0, "cash": 0.26, "cashKrw": 388, "cashJpy": 41, "yieldRatio": 0.0009, "ttmYieldRatio": 0.0035}
+      ],
+      "totalCash": 1.04,
+      "totalCashKrw": 1551,
+      "totalCashJpy": 164
+    }
+  },
+  "history": {
+    "result": [
+      {"exDate": "2025-08-11", "paymentDate": "2025-08-15", "currency": "USD", "ratio": 0.0, "cash": 0.26, "cashKrw": 388, "cashJpy": 41, "yieldRatio": 0.0011, "ttmYieldRatio": 0.0044},
+      {"exDate": "2025-11-10", "paymentDate": "2025-11-14", "currency": "USD", "ratio": 0.0, "cash": 0.26, "cashKrw": 388, "cashJpy": 41, "yieldRatio": 0.0011, "ttmYieldRatio": 0.0042},
+      {"exDate": "2026-02-09", "paymentDate": "2026-02-13", "currency": "USD", "ratio": 0.0, "cash": 0.26, "cashKrw": 388, "cashJpy": 41, "yieldRatio": 0.0009, "ttmYieldRatio": 0.0039},
+      {"exDate": "2026-05-09", "paymentDate": "2026-05-15", "currency": "USD", "ratio": 0.0, "cash": 0.26, "cashKrw": 388, "cashJpy": 41, "yieldRatio": 0.0009, "ttmYieldRatio": 0.0035}
+    ]
+  }
+}

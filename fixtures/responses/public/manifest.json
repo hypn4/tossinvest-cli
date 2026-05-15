@@ -139,6 +139,16 @@
       "file": "stock-financials-sndk.json",
       "url": "(combined stability+revenue+operating-income fixture for testing only)",
       "method": "POST"
+    },
+    {
+      "file": "stock-dividends-aapl.json",
+      "url": "(combined yield-card+years+history fixture for testing only)",
+      "method": "GET"
+    },
+    {
+      "file": "stock-dividends-sndk.json",
+      "url": "(combined yield-card+years+history fixture — empty case)",
+      "method": "GET"
     }
   ]
 }

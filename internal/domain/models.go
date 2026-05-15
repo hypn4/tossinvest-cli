@@ -669,3 +669,50 @@ type OperatingIncomePoint struct {
 	OperatingIncomeKrw   float64 `json:"operating_income_krw"`
 	OperatingIncomeRatio float64 `json:"operating_income_ratio"`
 }
+
+type StockDividends struct {
+	ProductCode string               `json:"product_code"`
+	Summary     DividendYieldCard    `json:"summary"`
+	RecentYears DividendYearsPayouts `json:"recent_years"`
+	FullHistory []DividendPayout     `json:"full_history"`
+	FetchedAt   time.Time            `json:"fetched_at"`
+}
+
+// DividendYieldCard is the TTM summary card from
+// /api/v1/stock-infos/{code}/dividends/yield-ratio/histories.
+type DividendYieldCard struct {
+	DividendCount         int      `json:"dividend_count"`
+	DividendMonths        []int    `json:"dividend_months"`
+	DividendCash          float64  `json:"dividend_cash"`
+	DividendCashKrw       *float64 `json:"dividend_cash_krw"`
+	DividendYieldRatio    float64  `json:"dividend_yield_ratio"`
+	TTMDividendYieldRatio float64  `json:"ttm_dividend_yield_ratio"`
+	TTMDividendMonths     []string `json:"ttm_dividend_months"`
+	TTMDps                float64  `json:"ttm_dps"`
+	TTMDpsKrw             *float64 `json:"ttm_dps_krw"`
+	TTMDividendTotalCount int      `json:"ttm_dividend_total_count"`
+	DividendGrowthRatio   *float64 `json:"dividend_growth_ratio"`
+	Currency              string   `json:"currency"`
+}
+
+// DividendYearsPayouts is the recent-range payout list from
+// /api/v1/stock-infos/dividend/{code}/years.
+type DividendYearsPayouts struct {
+	StartDate    string          `json:"start_date"`
+	RangeLabel   string          `json:"range_label"`
+	Payouts      []DividendPayout `json:"payouts"`
+	TotalCash    float64         `json:"total_cash"`
+	TotalCashKrw float64         `json:"total_cash_krw"`
+}
+
+// DividendPayout is one historical payout record (used by both `years` and
+// `summary` endpoints).
+type DividendPayout struct {
+	ExDate        string  `json:"ex_date"`
+	PaymentDate   string  `json:"payment_date"`
+	Currency      string  `json:"currency"`
+	Cash          float64 `json:"cash"`
+	CashKrw       float64 `json:"cash_krw"`
+	YieldRatio    float64 `json:"yield_ratio"`
+	TTMYieldRatio float64 `json:"ttm_yield_ratio"`
+}
