@@ -1,0 +1,20 @@
+{
+  "result": {
+    "orderableAmount": {"krw": 758893, "usd": 508.71},
+    "withdrawableAmount": {
+      "amount0": {"krw": 0, "usd": 508.71},
+      "date0": "2026-05-15",
+      "amount1": {"krw": 0, "usd": 508.71},
+      "date1": "2026-05-18"
+    },
+    "displayWithdrawableAmount": {
+      "amount0": {"krw": 0, "usd": 508.71},
+      "date0": "2026-05-15"
+    },
+    "depositAmount": {
+      "amount0": {"krw": 0, "usd": 0},
+      "date0": "2026-05-15"
+    },
+    "estimateSettlementAmount": {}
+  }
+}

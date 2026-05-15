@@ -1,0 +1,15 @@
+{
+  "result": {
+    "orderableAmount": {"krw": 110421, "usd": null},
+    "withdrawableAmount": {
+      "amount0": {"krw": 110421, "usd": null},
+      "date0": "2026-05-15"
+    },
+    "displayWithdrawableAmount": {
+      "amount0": {"krw": 110421, "usd": null},
+      "date0": "2026-05-15"
+    },
+    "depositAmount": {},
+    "estimateSettlementAmount": {}
+  }
+}

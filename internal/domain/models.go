@@ -45,21 +45,41 @@ type Position struct {
 	MarketType      string  `json:"market_type,omitempty"`
 	MarketCode      string  `json:"market_code,omitempty"`
 	Quantity        float64 `json:"quantity"`
+	TradableQuantity   float64 `json:"tradable_quantity,omitempty"`
+	UnsettledQuantity  float64 `json:"unsettled_quantity,omitempty"`
 	AveragePrice    float64 `json:"average_price,omitempty"`
 	CurrentPrice    float64 `json:"current_price,omitempty"`
+	CloseWithoutAfter float64 `json:"close_without_after,omitempty"`
 	MarketValue     float64 `json:"market_value,omitempty"`
+	MarketValueAfterFees float64 `json:"market_value_after_fees,omitempty"`
 	UnrealizedPnL   float64 `json:"unrealized_pnl,omitempty"`
+	UnrealizedPnLAfterFees float64 `json:"unrealized_pnl_after_fees,omitempty"`
 	ProfitRate      float64 `json:"profit_rate,omitempty"`
+	ProfitRateAfterFees float64 `json:"profit_rate_after_fees,omitempty"`
 	DailyProfitLoss float64 `json:"daily_profit_loss,omitempty"`
 	DailyProfitRate float64 `json:"daily_profit_rate,omitempty"`
+	EstimatedCommission float64 `json:"estimated_commission,omitempty"`
+	CommissionRate     float64 `json:"commission_rate,omitempty"`
+	EstimatedTax       float64 `json:"estimated_tax,omitempty"`
+	TaxRate            float64 `json:"tax_rate,omitempty"`
+	Delisting          bool    `json:"delisting,omitempty"`
+	NXTSupported       bool    `json:"nxt_supported,omitempty"`
+	NoticeSplitMerge          bool `json:"notice_split_merge,omitempty"`
+	NoticeEarningsAnnouncement bool `json:"notice_earnings_announcement,omitempty"`
 
 	AveragePriceUSD    float64 `json:"average_price_usd,omitempty"`
 	CurrentPriceUSD    float64 `json:"current_price_usd,omitempty"`
+	CloseWithoutAfterUSD float64 `json:"close_without_after_usd,omitempty"`
 	MarketValueUSD     float64 `json:"market_value_usd,omitempty"`
+	MarketValueAfterFeesUSD float64 `json:"market_value_after_fees_usd,omitempty"`
 	UnrealizedPnLUSD   float64 `json:"unrealized_pnl_usd,omitempty"`
+	UnrealizedPnLAfterFeesUSD float64 `json:"unrealized_pnl_after_fees_usd,omitempty"`
 	ProfitRateUSD      float64 `json:"profit_rate_usd,omitempty"`
+	ProfitRateAfterFeesUSD float64 `json:"profit_rate_after_fees_usd,omitempty"`
 	DailyProfitLossUSD float64 `json:"daily_profit_loss_usd,omitempty"`
 	DailyProfitRateUSD float64 `json:"daily_profit_rate_usd,omitempty"`
+	EstimatedCommissionUSD float64 `json:"estimated_commission_usd,omitempty"`
+	EstimatedTaxUSD        float64 `json:"estimated_tax_usd,omitempty"`
 }
 
 type Order struct {
@@ -158,6 +178,30 @@ type WithdrawableBottomSheetEntry struct {
 	Title string  `json:"title"`
 	KRW   float64 `json:"krw,omitempty"`
 	USD   float64 `json:"usd,omitempty"`
+}
+
+type Money struct {
+	KRW float64 `json:"krw,omitempty"`
+	USD float64 `json:"usd,omitempty"`
+}
+
+type OrderableSummary struct {
+	OrderableKR Money               `json:"orderable_kr"`
+	OrderableUS Money               `json:"orderable_us"`
+	KR          TransactionOverview `json:"kr_overview"`
+	US          TransactionOverview `json:"us_overview"`
+	FetchedAt   time.Time           `json:"fetched_at"`
+}
+
+type CompactExecution struct {
+	ProductCode             string    `json:"product_code"`
+	TradeType               string    `json:"trade_type"` // "buy" or "sell"
+	ExecutionAvgKRWPrice    float64   `json:"execution_avg_krw_price"`
+	ExecutionAvgLocalPrice  float64   `json:"execution_avg_local_price"`
+	ExecutionTotalKRWAmount float64   `json:"execution_total_krw_amount"`
+	ExecutionTotalLocal     float64   `json:"execution_total_local"`
+	Quantity                float64   `json:"quantity"`
+	BucketStart             time.Time `json:"bucket_start"`
 }
 
 type Quote struct {

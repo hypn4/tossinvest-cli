@@ -237,6 +237,13 @@ func (c *Client) getStockHeader(ctx context.Context, productCode string) (stockH
 	return envelope.Result, nil
 }
 
+// ResolveProductCode resolves a user-supplied symbol (e.g. "SOXL", "A005930", or
+// a productCode) to the canonical Toss productCode used by the trading endpoints.
+// Thin exported wrapper over resolveProductCode for command-layer callers.
+func (c *Client) ResolveProductCode(ctx context.Context, symbol string) (string, error) {
+	return c.resolveProductCode(ctx, symbol)
+}
+
 func (c *Client) resolveProductCode(ctx context.Context, symbol string) (string, error) {
 	normalized := normalizeProductCode(symbol)
 	if normalized == "" {
@@ -255,12 +262,6 @@ func (c *Client) resolveProductCode(ctx context.Context, symbol string) (string,
 		return "", fmt.Errorf("no product code result returned for %s", normalized)
 	}
 	return envelope.Result.Stocks[0].StockCode, nil
-}
-
-// ResolveProductCode is the public wrapper for callers (CLI commands) that
-// need to convert a user-typed symbol into a Toss product code.
-func (c *Client) ResolveProductCode(ctx context.Context, symbol string) (string, error) {
-	return c.resolveProductCode(ctx, symbol)
 }
 
 func (c *Client) getStockInfo(ctx context.Context, productCode string) (stockInfoResult, error) {

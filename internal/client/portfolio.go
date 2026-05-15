@@ -56,7 +56,41 @@ type sortedOverviewData struct {
 				KRW *float64 `json:"krw"`
 				USD *float64 `json:"usd"`
 			} `json:"dailyProfitLossRate"`
-			MarketCode string `json:"marketCode"`
+			MarketCode       string  `json:"marketCode"`
+			TradableQuantity float64 `json:"tradableQuantity"`
+			UnsettledQuantity float64 `json:"unsettledQuantity"`
+			CloseWithoutAfter struct {
+				KRW *float64 `json:"krw"`
+				USD *float64 `json:"usd"`
+			} `json:"closeWithoutAfter"`
+			EvaluatedAmountAfterFees struct {
+				KRW *float64 `json:"krw"`
+				USD *float64 `json:"usd"`
+			} `json:"evaluatedAmountAfterFees"`
+			ProfitLossAmountAfterFees struct {
+				KRW *float64 `json:"krw"`
+				USD *float64 `json:"usd"`
+			} `json:"profitLossAmountAfterFees"`
+			ProfitLossRateAfterFees struct {
+				KRW *float64 `json:"krw"`
+				USD *float64 `json:"usd"`
+			} `json:"profitLossRateAfterFees"`
+			Commission struct {
+				KRW *float64 `json:"krw"`
+				USD *float64 `json:"usd"`
+			} `json:"commission"`
+			CommissionRate float64 `json:"commissionRate"`
+			Tax struct {
+				KRW *float64 `json:"krw"`
+				USD *float64 `json:"usd"`
+			} `json:"tax"`
+			TaxRate      float64 `json:"taxRate"`
+			Delisting    bool    `json:"delisting"`
+			NXTSupported bool    `json:"nxtSupported"`
+			Notice struct {
+				SplitMerge           bool `json:"splitMerge"`
+				EarningsAnnouncement bool `json:"earningsAnnouncement"`
+			} `json:"notice"`
 		} `json:"items"`
 	} `json:"products"`
 }
@@ -122,6 +156,27 @@ func (c *Client) ListPositions(ctx context.Context) ([]domain.Position, error) {
 				ProfitRateUSD:      derefFloat(item.ProfitLossRate.USD),
 				DailyProfitLossUSD: derefFloat(item.DailyProfitLossAmount.USD),
 				DailyProfitRateUSD: derefFloat(item.DailyProfitLossRate.USD),
+
+				TradableQuantity:           item.TradableQuantity,
+				UnsettledQuantity:          item.UnsettledQuantity,
+				CloseWithoutAfter:          coalesceMoney(item.CloseWithoutAfter.KRW, item.CloseWithoutAfter.USD),
+				CloseWithoutAfterUSD:       derefFloat(item.CloseWithoutAfter.USD),
+				MarketValueAfterFees:       coalesceMoney(item.EvaluatedAmountAfterFees.KRW, item.EvaluatedAmountAfterFees.USD),
+				MarketValueAfterFeesUSD:    derefFloat(item.EvaluatedAmountAfterFees.USD),
+				UnrealizedPnLAfterFees:     coalesceMoney(item.ProfitLossAmountAfterFees.KRW, item.ProfitLossAmountAfterFees.USD),
+				UnrealizedPnLAfterFeesUSD:  derefFloat(item.ProfitLossAmountAfterFees.USD),
+				ProfitRateAfterFees:        coalesceMoney(item.ProfitLossRateAfterFees.KRW, item.ProfitLossRateAfterFees.USD),
+				ProfitRateAfterFeesUSD:     derefFloat(item.ProfitLossRateAfterFees.USD),
+				EstimatedCommission:        coalesceMoney(item.Commission.KRW, item.Commission.USD),
+				EstimatedCommissionUSD:     derefFloat(item.Commission.USD),
+				CommissionRate:             item.CommissionRate,
+				EstimatedTax:               coalesceMoney(item.Tax.KRW, item.Tax.USD),
+				EstimatedTaxUSD:            derefFloat(item.Tax.USD),
+				TaxRate:                    item.TaxRate,
+				Delisting:                  item.Delisting,
+				NXTSupported:               item.NXTSupported,
+				NoticeSplitMerge:           item.Notice.SplitMerge,
+				NoticeEarningsAnnouncement: item.Notice.EarningsAnnouncement,
 			})
 		}
 	}

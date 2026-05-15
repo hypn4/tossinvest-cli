@@ -70,6 +70,35 @@ type withdrawableAmountEnvelope struct {
 	Result map[string]any `json:"result"`
 }
 
+// CachedOrderableAmount carries both markets' orderable balances in both
+// currencies, as returned by /api/v1/dashboard/common/cached-orderable-amount.
+type CachedOrderableAmount struct {
+	KR domain.Money `json:"kr"`
+	US domain.Money `json:"us"`
+}
+
+// GetCachedOrderableAmount fetches /api/v1/dashboard/common/cached-orderable-amount
+// and returns the per-market amounts in both currencies.
+func (c *Client) GetCachedOrderableAmount(ctx context.Context) (CachedOrderableAmount, error) {
+	if err := c.requireSession(); err != nil {
+		return CachedOrderableAmount{}, err
+	}
+	var envelope orderableAmountEnvelope
+	if err := c.getJSON(ctx, c.certBaseURL+"/api/v1/dashboard/common/cached-orderable-amount", &envelope); err != nil {
+		return CachedOrderableAmount{}, err
+	}
+	return CachedOrderableAmount{
+		KR: domain.Money{
+			KRW: pointerFloat(envelope.Result.OrderableAmountKr.KRW),
+			USD: pointerFloat(envelope.Result.OrderableAmountKr.USD),
+		},
+		US: domain.Money{
+			KRW: pointerFloat(envelope.Result.OrderableAmountUs.KRW),
+			USD: pointerFloat(envelope.Result.OrderableAmountUs.USD),
+		},
+	}, nil
+}
+
 type pendingOrdersEnvelope struct {
 	Result []json.RawMessage `json:"result"`
 }
