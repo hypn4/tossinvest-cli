@@ -56,7 +56,9 @@ This file is the source of truth for endpoint discovery. It should grow before t
 | `public` | `GET` | `wts-cert-api.tossinvest.com` | `/api/v1/dashboard/wts/overview/calendar/economic-events` | calendar snippets | object under `.result` | none | public page dependency |
 | `public` | `POST` | `wts-cert-api.tossinvest.com` | `/api/v2/dashboard/wts/overview/ranking` | overview ranking widgets | object under `.result` | none | body contract still needs capture |
 | `public` | `POST` | `wts-info-api.tossinvest.com` | `/api/v1/dashboard/intelligences/all` | dashboard cards | object under `.result` | none | body contract still needs capture |
-| `public` | `POST` | `wts-info-api.tossinvest.com` | `/api/v2/dashboard/wts/overview/signals` | signal cards on stock detail/home | object under `.result` | none | body contract still needs capture |
+| `public` | `POST` | `wts-info-api.tossinvest.com` | `/api/v1/dashboard/wts/overview/ai-signals` | batch one-line AI reasoning per code | `.result.signals[]` with `productCode`, `reasoningDescription` (≤25 chars Korean) | `signals list <syms>` (since v0.5.x) | body `{"productCodes":[...]}` |
+| `public` | `GET` | `wts-info-api.tossinvest.com` | `/api/v1/dashboard/wts/overview/ai-signals/detail` | full AI reasoning + news + related stocks for a single product | `.result` with `signalDirection`, `reasoning.description.data[]`, `reasoning.news.data[]`, `reasoning.keywords[]`, `relatedReasoning.details[]` | `signals detail <sym>` (since v0.5.x) | query `productCode={code}&productType=STOCKS` |
+| `public` | `POST` | `wts-info-api.tossinvest.com` | `/api/v2/dashboard/wts/overview/signals` | scheduled event signals (실적·공시) | `.result.signalsList[]` keyed by `primarySignal.signalId` (6000000-range = 실적 발표) | `signals events <syms>` (since v0.5.x) | body `{"productCodes":[...],"filters":[]}` |
 
 ## Quote and Symbol Detail
 
