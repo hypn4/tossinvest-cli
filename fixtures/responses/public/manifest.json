@@ -79,6 +79,16 @@
       "file": "stock-detail-ui-info-snxx.json",
       "url": "https://wts-info-api.tossinvest.com/api/v1/stock-detail/ui/NAS0250224006/info",
       "method": "GET"
+    },
+    {
+      "file": "stock-info-opt-sndk-call.json",
+      "url": "https://wts-info-api.tossinvest.com/api/v2/stock-infos/OPT_SNDK260515C01395000_20260506",
+      "method": "GET"
+    },
+    {
+      "file": "option-default-chart-option-sndk.json",
+      "url": "https://wts-info-api.tossinvest.com/api/v1/option-infos/default-chart-option?underlyingGuid=NAS0250224006",
+      "method": "GET"
     }
   ]
 }
