@@ -7,7 +7,11 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync/atomic"
 	"testing"
+	"time"
+
+	"github.com/junghoonkye/tossinvest-cli/internal/domain"
 )
 
 func TestChartOptionsResolveTimeframe(t *testing.T) {
@@ -114,5 +118,84 @@ func TestGetChartFromFixture(t *testing.T) {
 	first := chart.Candles[0]
 	if first.Open == 0 || first.Close == 0 {
 		t.Fatalf("first candle missing OHLC fields: %+v", first)
+	}
+}
+
+func TestStreamChartEmitsIntraBucketAndNewBucket(t *testing.T) {
+	t.Parallel()
+
+	root := fixtureRoot(t)
+	stockInfo := mustReadFile(t, filepath.Join(root, "stock-info.json"))
+
+	bodies := [][]byte{
+		[]byte(`{"result":{"code":"A005930","exchangeRate":1,"candles":[
+			{"dt":"2026-05-15T10:00:00+09:00","open":100,"high":102,"low":99,"close":101,"volume":1000}
+		]}}`),
+		[]byte(`{"result":{"code":"A005930","exchangeRate":1,"candles":[
+			{"dt":"2026-05-15T10:00:00+09:00","open":100,"high":103,"low":99,"close":102,"volume":1500}
+		]}}`),
+		[]byte(`{"result":{"code":"A005930","exchangeRate":1,"candles":[
+			{"dt":"2026-05-15T10:30:00+09:00","open":102,"high":104,"low":101,"close":103,"volume":800},
+			{"dt":"2026-05-15T10:00:00+09:00","open":100,"high":103,"low":99,"close":102,"volume":1500}
+		]}}`),
+		[]byte(`{"result":{"code":"A005930","exchangeRate":1,"candles":[
+			{"dt":"2026-05-15T10:30:00+09:00","open":102,"high":104,"low":101,"close":103,"volume":800},
+			{"dt":"2026-05-15T10:00:00+09:00","open":100,"high":103,"low":99,"close":102,"volume":1500}
+		]}}`),
+	}
+
+	var calls atomic.Int32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case strings.HasPrefix(r.URL.Path, "/api/v2/stock-infos/"):
+			w.Write(stockInfo)
+		case strings.Contains(r.URL.Path, "/api/v1/c-chart/"):
+			idx := int(calls.Add(1)) - 1
+			if idx >= len(bodies) {
+				idx = len(bodies) - 1
+			}
+			w.Write(bodies[idx])
+		default:
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+	}))
+	defer server.Close()
+
+	c := New(Config{HTTPClient: server.Client(), InfoBaseURL: server.URL})
+
+	stream, err := c.StreamChart(StreamChartOptions{
+		Symbol:    "A005930",
+		Timeframe: "30m",
+		Count:     2,
+		Interval:  1,
+	})
+	if err != nil {
+		t.Fatalf("StreamChart returned error: %v", err)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	emitted := []domain.Candle{}
+
+	go func() {
+		defer cancel()
+		for c := range stream.Ticks() {
+			emitted = append(emitted, c)
+			if len(emitted) == 3 {
+				time.Sleep(20 * time.Millisecond)
+				stream.Close()
+				return
+			}
+		}
+	}()
+
+	if err := stream.Run(ctx); err != nil && err != context.Canceled {
+		t.Fatalf("Run returned %v", err)
+	}
+
+	if len(emitted) != 3 {
+		t.Fatalf("expected 3 candles emitted, got %d: %+v", len(emitted), emitted)
+	}
+	if emitted[0].Close != 101 || emitted[1].Close != 102 || emitted[2].Close != 103 {
+		t.Fatalf("unexpected emit order: %+v", emitted)
 	}
 }

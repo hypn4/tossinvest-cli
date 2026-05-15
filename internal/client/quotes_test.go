@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -21,6 +22,15 @@ func fixtureRoot(t *testing.T) string {
 		t.Fatal("failed to resolve test path")
 	}
 	return filepath.Join(filepath.Dir(filename), "..", "..", "fixtures", "responses", "public")
+}
+
+func mustReadFile(t *testing.T, path string) []byte {
+	t.Helper()
+	b, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("read %s: %v", path, err)
+	}
+	return b
 }
 
 func TestGetOrderBookUS(t *testing.T) {
