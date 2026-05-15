@@ -33,6 +33,7 @@ All notable changes to this project will be documented in this file.
 - `tossctl stock financials <symbol>` — financial snapshot (안정성 + 매출/순이익 시계열 + 영업이익 시계열) via `/api/v2/stock-infos/stability|revenue-and-net-profit|operating-income/{code}` (all POST `{}`).
 - `tossctl stock dividends <symbol> [--all-history]` — dividend snapshot (TTM yield card + recent-range payouts + optional full history) via `/api/v1/stock-infos/{code}/dividends/yield-ratio/histories` + `/api/v1/stock-infos/dividend/{code}/years` + `/api/v1/stock-infos/dividend/{code}/summary`. Non-paying stocks render `"No dividends recorded for this stock."`
 - `tossctl stock estimates <symbol>` — analyst forecast snapshot (next-earnings headline + revenue/EPS/operating-income time series with surprise %) via `/api/v2/companies/{code}/financial/estimate/{date,revenue,eps,operating-income}`. Stocks without analyst coverage for a metric render `(no analyst coverage)` for that section.
+- `tossctl stock statements <symbol> [--type BAL|INC|CAS] [--period Q|Y]` — full financial-statement records (BS/IS/CF line items, pivoted by period) via POST `/api/v2/companies/{code}/financial-statement-records` with `{factorCode, period}` body. Default INC/Q. Closes the dense-endpoint gap deferred from PR10.
 
 ### Changed
 - `cmd/tossctl/chart.go`, `cmd/tossctl/quotes.go`, `cmd/tossctl/quote.go` long help text now documents that `--follow` is REST polling (no SSE/WebSocket from Toss) and that closed-market silence is correct behavior.

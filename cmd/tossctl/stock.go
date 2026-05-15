@@ -299,6 +299,46 @@ Examples:
 		},
 	}
 
-	cmd.AddCommand(infoCmd, overviewCmd, indicatorsCmd, valuationCmd, revenueCmd, peersCmd, analystCmd, financialsCmd, dividendsCmd, estimatesCmd)
+	var statementsFactor, statementsPeriod string
+	statementsCmd := &cobra.Command{
+		Use:   "statements <symbol>",
+		Short: "Financial-statement records (BAL/INC/CAS × Q/Y, pivoted by period)",
+		Long: `Fetch the full financial-statement-records table from
+/api/v2/companies/{code}/financial-statement-records (POST {factorCode, period}).
+
+--type selects the statement:
+  BAL  재무상태표 (balance sheet)
+  INC  손익계산서 (income statement, default)
+  CAS  현금흐름표 (cash flow statement)
+
+--period selects:
+  Q  분기 (quarterly, default)
+  Y  연간 (annual)
+
+Output pivots the table: rows are line items (children indented under parents),
+columns are periods (oldest-first). Values are in millions of the unit
+reported by Toss (typically USD for US stocks, KRW for KR stocks).
+
+Examples:
+  tossctl stock statements SNDK
+  tossctl stock statements SNDK --type BAL --period Y
+  tossctl stock statements NAS0250224006 --type CAS --output csv`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			app, err := newAppContext(opts)
+			if err != nil {
+				return err
+			}
+			st, err := app.client.GetStockStatements(cmd.Context(), args[0], statementsFactor, statementsPeriod)
+			if err != nil {
+				return userFacingCommandError(err)
+			}
+			return output.WriteStockStatements(cmd.OutOrStdout(), app.format, st)
+		},
+	}
+	statementsCmd.Flags().StringVar(&statementsFactor, "type", "INC", "Statement type: BAL (balance sheet), INC (income statement), CAS (cash flow)")
+	statementsCmd.Flags().StringVar(&statementsPeriod, "period", "Q", "Period granularity: Q (quarterly) or Y (annual)")
+
+	cmd.AddCommand(infoCmd, overviewCmd, indicatorsCmd, valuationCmd, revenueCmd, peersCmd, analystCmd, financialsCmd, dividendsCmd, estimatesCmd, statementsCmd)
 	return cmd
 }
