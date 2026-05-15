@@ -360,3 +360,55 @@ type EventSignal struct {
 	SignalID    int64     `json:"signal_id"`
 	DateTime    time.Time `json:"datetime"`
 }
+
+// StockInfoDetail is the full 종목정보 deep-tab payload. Sections are
+// untyped on purpose: there are 13+ section types and the schemas vary
+// independently (FINANCES, EARNINGS_AND_CONSENSUS, etc.). Consumers
+// inspect Sections[i].Type and unmarshal Data themselves.
+//
+// Endpoint: GET /api/v1/stock-detail/ui/{productCode}/info
+type StockInfoDetail struct {
+	ProductCode string             `json:"product_code"`
+	Sections    []StockInfoSection `json:"sections"`
+	FetchedAt   time.Time          `json:"fetched_at"`
+}
+
+type StockInfoSection struct {
+	Type string          `json:"type"`
+	Data json.RawMessage `json:"data"`
+}
+
+// OptionInstrument captures the option-specific metadata returned by
+// /api/v2/stock-infos/{OPT_…} under result.optionInstrument.
+type OptionInstrument struct {
+	ProductCode         string    `json:"product_code"`
+	MarketCode          string    `json:"market_code,omitempty"`
+	RootSymbol          string    `json:"root_symbol,omitempty"`
+	Name                string    `json:"name,omitempty"`
+	FullName            string    `json:"full_name,omitempty"`
+	CompleteName        string    `json:"complete_name,omitempty"`
+	UnderlyingSymbol    string    `json:"underlying_symbol,omitempty"`
+	UnderlyingGuid      string    `json:"underlying_guid,omitempty"`
+	UnderlyingName      string    `json:"underlying_name,omitempty"`
+	MaturityDate        string    `json:"maturity_date,omitempty"`
+	MaturityDateTime    string    `json:"maturity_date_time,omitempty"`
+	PutCall             string    `json:"put_call,omitempty"`
+	StrikePrice         float64   `json:"strike_price,omitempty"`
+	BasePrice           float64   `json:"base_price,omitempty"`
+	Last                float64   `json:"last,omitempty"`
+	Bid                 float64   `json:"bid,omitempty"`
+	Ask                 float64   `json:"ask,omitempty"`
+	Mid                 float64   `json:"mid,omitempty"`
+	ContractUnit        float64   `json:"contract_unit,omitempty"`
+	OpenInterest        int       `json:"open_interest,omitempty"`
+	Halted              bool      `json:"halted,omitempty"`
+	TradingSuspended    bool      `json:"trading_suspended,omitempty"`
+	BuySuspended        bool      `json:"buy_suspended,omitempty"`
+	SellSuspended       bool      `json:"sell_suspended,omitempty"`
+	Status              string    `json:"status,omitempty"`
+	Overtime            bool      `json:"overtime,omitempty"`
+	LiquidationDisplay  string    `json:"liquidation_display,omitempty"`
+	LiquidationDateTime string    `json:"liquidation_date_time,omitempty"`
+	PennyPilot          bool      `json:"penny_pilot,omitempty"`
+	FetchedAt           time.Time `json:"fetched_at"`
+}
