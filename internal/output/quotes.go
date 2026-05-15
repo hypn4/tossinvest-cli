@@ -128,6 +128,20 @@ func WriteTickNDJSON(w io.Writer, tick domain.Tick) error {
 	return err
 }
 
+// WriteOrderBookNDJSON writes a single orderbook snapshot as one JSON object
+// terminated by '\n'. Used by `tossctl quotes book --follow`.
+func WriteOrderBookNDJSON(w io.Writer, book domain.OrderBook) error {
+	data, err := json.Marshal(book)
+	if err != nil {
+		return err
+	}
+	if _, err := w.Write(data); err != nil {
+		return err
+	}
+	_, err = w.Write([]byte{'\n'})
+	return err
+}
+
 func labelFor(symbol, name, productCode string) string {
 	if symbol != "" && name != "" && symbol != name {
 		return fmt.Sprintf("%s — %s", symbol, name)
