@@ -7,7 +7,12 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
+	"sync/atomic"
 	"testing"
+	"time"
+
+	"github.com/junghoonkye/tossinvest-cli/internal/domain"
 )
 
 func TestGetQuoteFromFixtures(t *testing.T) {
@@ -134,4 +139,75 @@ func mustPublicFixturePath(t *testing.T, path string) string {
 		t.Fatalf("fixture missing: %s: %v", path, err)
 	}
 	return path
+}
+
+func TestStreamQuoteEmitsOnPriceOrVolumeChange(t *testing.T) {
+	t.Parallel()
+
+	root := fixtureRoot(t)
+	stockInfo := mustReadFile(t, filepath.Join(root, "stock-info.json"))
+
+	bodies := [][]byte{
+		[]byte(`{"result":[{"code":"US20100311002","currency":"USD","tradeDateTime":"2026-05-15T15:00:00","open":166,"high":172,"low":161,"close":167.10,"volume":1500000,"base":186.19}]}`),
+		[]byte(`{"result":[{"code":"US20100311002","currency":"USD","tradeDateTime":"2026-05-15T15:00:01","open":166,"high":172,"low":161,"close":167.10,"volume":1501000,"base":186.19}]}`),
+		[]byte(`{"result":[{"code":"US20100311002","currency":"USD","tradeDateTime":"2026-05-15T15:00:01","open":166,"high":172,"low":161,"close":167.10,"volume":1501000,"base":186.19}]}`),
+		[]byte(`{"result":[{"code":"US20100311002","currency":"USD","tradeDateTime":"2026-05-15T15:00:02","open":166,"high":172,"low":161,"close":167.20,"volume":1501000,"base":186.19}]}`),
+	}
+
+	var calls atomic.Int32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case strings.HasPrefix(r.URL.Path, "/api/v2/stock-infos/"):
+			w.Write(stockInfo)
+		case strings.Contains(r.URL.Path, "/api/v3/stock-prices/details"):
+			idx := int(calls.Add(1)) - 1
+			if idx >= len(bodies) {
+				idx = len(bodies) - 1
+			}
+			w.Write(bodies[idx])
+		case strings.HasPrefix(r.URL.Path, "/api/v1/stock-infos/header/"):
+			w.Write([]byte(`{"result":{"sections":[]}}`))
+		case strings.HasPrefix(r.URL.Path, "/api/v1/stock-detail/ui/"):
+			w.Write([]byte(`{"result":{"badges":[],"notices":[]}}`))
+		default:
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+	}))
+	defer server.Close()
+
+	c := New(Config{HTTPClient: server.Client(), InfoBaseURL: server.URL})
+
+	stream, err := c.StreamQuote(StreamQuoteOptions{
+		Symbol:   "US20100311002",
+		Interval: 1,
+	})
+	if err != nil {
+		t.Fatalf("StreamQuote error: %v", err)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	emitted := []domain.Quote{}
+
+	go func() {
+		defer cancel()
+		for q := range stream.Quotes() {
+			emitted = append(emitted, q)
+			if len(emitted) == 3 {
+				time.Sleep(20 * time.Millisecond)
+				stream.Close()
+				return
+			}
+		}
+	}()
+
+	if err := stream.Run(ctx); err != nil && err != context.Canceled {
+		t.Fatalf("Run returned %v", err)
+	}
+
+	if len(emitted) != 3 {
+		t.Fatalf("expected 3 emits, got %d: %+v", len(emitted), emitted)
+	}
+	if emitted[0].Last != 167.10 || emitted[1].Volume != 1501000 || emitted[2].Last != 167.20 {
+		t.Fatalf("unexpected emits: %+v", emitted)
+	}
 }
