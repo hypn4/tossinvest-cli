@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/junghoonkye/tossinvest-cli/internal/domain"
 	"github.com/junghoonkye/tossinvest-cli/internal/session"
 )
 
@@ -45,6 +46,25 @@ func TestListPositionsFromFixtures(t *testing.T) {
 	}
 	if positions[0].Name == "" {
 		t.Fatal("expected first position to have a name")
+	}
+
+	var soxl *domain.Position
+	for i := range positions {
+		if positions[i].ProductCode == "US20100311002" {
+			soxl = &positions[i]
+		}
+	}
+	if soxl == nil {
+		t.Fatal("expected SOXL position in fixture")
+	}
+	if soxl.TradableQuantity != 20 {
+		t.Fatalf("expected TradableQuantity=20, got %v", soxl.TradableQuantity)
+	}
+	if soxl.MarketValueAfterFees == 0 || soxl.MarketValueAfterFees >= soxl.MarketValue {
+		t.Fatalf("after-fees value should be smaller and non-zero: %+v", soxl)
+	}
+	if soxl.CommissionRate != 0.001 {
+		t.Fatalf("expected commissionRate=0.001, got %v", soxl.CommissionRate)
 	}
 }
 

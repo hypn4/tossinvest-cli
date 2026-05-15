@@ -989,6 +989,107 @@
                     "earningsAnnouncement": false
                   },
                   "shareHoldingsType": "us"
+                },
+                {
+                  "id": 0,
+                  "key": "99999999999::US20100311002::US25459W4583::SOXL",
+                  "stockCode": "US20100311002",
+                  "stockIsin": "US25459W4583",
+                  "stockSymbol": "SOXL",
+                  "stockName": "SOXL",
+                  "logoImageUrl": "https://static.toss.im/png-icons/securities/icn-sec-fill-SOXL.png?20240409",
+                  "quantity": 20.0,
+                  "tradableQuantity": 20.0,
+                  "unsettledQuantity": 0,
+                  "currentPrice": {
+                    "krw": 251726,
+                    "usd": 168.74
+                  },
+                  "basePrice": {
+                    "krw": 277758,
+                    "usd": 186.19
+                  },
+                  "closeWithoutAfter": {
+                    "krw": 251726,
+                    "usd": 168.74
+                  },
+                  "baseWithoutAfter": {
+                    "krw": 277758,
+                    "usd": 186.19
+                  },
+                  "purchasePrice": {
+                    "krw": 277505,
+                    "usd": 185.61
+                  },
+                  "purchaseAmount": {
+                    "krw": 5550110,
+                    "usd": 3712.2
+                  },
+                  "evaluatedAmount": {
+                    "krw": 5034526.64,
+                    "usd": 3374.8
+                  },
+                  "evaluatedAmountAfterFees": {
+                    "krw": 5023946.64,
+                    "usd": 3367.72
+                  },
+                  "profitLossAmount": {
+                    "krw": -515583.36,
+                    "usd": -337.4
+                  },
+                  "profitLossAmountAfterFees": {
+                    "krw": -526163.36,
+                    "usd": -344.48
+                  },
+                  "dailyProfitLossAmount": {
+                    "krw": -520638.2,
+                    "usd": -349.0
+                  },
+                  "profitLossRate": {
+                    "krw": -0.0928,
+                    "usd": -0.0908
+                  },
+                  "profitLossRateAfterFees": {
+                    "krw": -0.0948,
+                    "usd": -0.0927
+                  },
+                  "dailyProfitLossRate": {
+                    "krw": -0.0938,
+                    "usd": -0.094
+                  },
+                  "commission": {
+                    "krw": 10580,
+                    "usd": 7.08
+                  },
+                  "commissionRate": 0.001,
+                  "buyCommission": {
+                    "krw": 5546,
+                    "usd": 3.71
+                  },
+                  "sellCommission": {
+                    "krw": 5034,
+                    "usd": 3.37
+                  },
+                  "tax": null,
+                  "taxRate": null,
+                  "delisting": false,
+                  "unlisting": false,
+                  "archiving": false,
+                  "errorPricing": false,
+                  "nxtSupported": false,
+                  "domesticExchange": "integrated",
+                  "marketCode": "AMX",
+                  "stockGroupCode": "",
+                  "stockWarrants": false,
+                  "stockWarrantsLink": null,
+                  "shortSellingQuantity": 0,
+                  "rightExpectedQuantity": 0,
+                  "rightEvaluatedAmount": 0,
+                  "notice": {
+                    "splitMerge": false,
+                    "earningsAnnouncement": false
+                  },
+                  "shareHoldingsType": "us"
                 }
               ],
               "principalAmount": {
