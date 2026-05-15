@@ -79,6 +79,37 @@ func TestListOptionExpiriesFromFixture(t *testing.T) {
 	}
 }
 
+func TestGetOptionChainFromFixture(t *testing.T) {
+	t.Parallel()
+	root := fixtureRoot(t)
+	body := mustReadFile(t, filepath.Join(root, "option-chain-sndk-2026-05-15.json"))
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/v1/option-both-chain/get-all" {
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+		if r.URL.Query().Get("underlyingGuid") != "NAS0250224006" {
+			t.Fatalf("bad underlyingGuid: %s", r.URL.Query().Get("underlyingGuid"))
+		}
+		if r.URL.Query().Get("maturityDate") != "2026-05-15" {
+			t.Fatalf("bad maturityDate: %s", r.URL.Query().Get("maturityDate"))
+		}
+		w.Write(body)
+	}))
+	defer server.Close()
+
+	c := New(Config{HTTPClient: server.Client(), InfoBaseURL: server.URL})
+	rows, err := c.GetOptionChain(context.Background(), "NAS0250224006", "2026-05-15")
+	if err != nil {
+		t.Fatalf("GetOptionChain error: %v", err)
+	}
+	if len(rows) != 3 {
+		t.Fatalf("expected 3 rows, got %d", len(rows))
+	}
+	if rows[2].StrikePrice != 1395 || rows[2].CallGuid != "OPT_SNDK260515C01395000_20260506" {
+		t.Fatalf("unexpected last row: %+v", rows[2])
+	}
+}
+
 func TestGetNearestATMOptionFromFixture(t *testing.T) {
 	t.Parallel()
 	root := fixtureRoot(t)

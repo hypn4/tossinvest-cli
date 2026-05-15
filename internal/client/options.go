@@ -121,6 +121,49 @@ func (c *Client) GetNearestATMOption(ctx context.Context, underlying string) (st
 	return envelope.Result, nil
 }
 
+type optionChainEnvelope struct {
+	Result []struct {
+		StrikePrice      float64 `json:"strikePrice"`
+		CallGuid         string  `json:"callGuid"`
+		PutGuid          string  `json:"putGuid"`
+		CallOpenInterest int     `json:"callOpenInterest"`
+		PutOpenInterest  int     `json:"putOpenInterest"`
+	} `json:"result"`
+}
+
+// GetOptionChain returns the strike chain for an underlying's specific expiry.
+// `maturityDate` must be in YYYY-MM-DD form.
+func (c *Client) GetOptionChain(ctx context.Context, underlying, maturityDate string) ([]domain.OptionChainRow, error) {
+	productCode, err := c.resolveProductCode(ctx, underlying)
+	if err != nil {
+		return nil, err
+	}
+	endpoint, err := url.Parse(fmt.Sprintf("%s/api/v1/option-both-chain/get-all", c.infoBaseURL))
+	if err != nil {
+		return nil, err
+	}
+	q := endpoint.Query()
+	q.Set("underlyingGuid", productCode)
+	q.Set("maturityDate", maturityDate)
+	endpoint.RawQuery = q.Encode()
+
+	var env optionChainEnvelope
+	if err := c.getJSON(ctx, endpoint.String(), &env); err != nil {
+		return nil, err
+	}
+	out := make([]domain.OptionChainRow, 0, len(env.Result))
+	for _, r := range env.Result {
+		out = append(out, domain.OptionChainRow{
+			StrikePrice:      r.StrikePrice,
+			CallGuid:         r.CallGuid,
+			PutGuid:          r.PutGuid,
+			CallOpenInterest: r.CallOpenInterest,
+			PutOpenInterest:  r.PutOpenInterest,
+		})
+	}
+	return out, nil
+}
+
 type optionExpiriesEnvelope struct {
 	Result struct {
 		Items []struct {

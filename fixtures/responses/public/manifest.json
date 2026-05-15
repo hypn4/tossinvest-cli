@@ -94,6 +94,11 @@
       "file": "option-expiries-sndk.json",
       "url": "https://wts-info-api.tossinvest.com/api/v1/option-maturity-date/get-all?underlyingGuid=NAS0250224006",
       "method": "GET"
+    },
+    {
+      "file": "option-chain-sndk-2026-05-15.json",
+      "url": "https://wts-info-api.tossinvest.com/api/v1/option-both-chain/get-all?underlyingGuid=NAS0250224006&maturityDate=2026-05-15",
+      "method": "GET"
     }
   ]
 }
