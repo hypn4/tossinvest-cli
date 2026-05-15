@@ -1,0 +1,52 @@
+{
+  "result": {
+    "baseDate": "2020-12-01T00:00:00",
+    "majorList": [
+      {
+        "id": 209,
+        "title": "컴퓨터와 주변기기",
+        "imageUrl": "https://static.toss.im/ml-product/computer-speaker-monitor-area.png",
+        "ordering": 1,
+        "description": "sd카드, usb 메모리 등 판매",
+        "representative": true,
+        "companyCount": 85,
+        "rankings": [
+          {
+            "baseDate": "2026-05-16",
+            "baseDateTime": "2026-05-16T03:50:46",
+            "fiscalPeriod": "Q",
+            "type": {"code": 1, "displayName": "시가총액"},
+            "ranking": 5,
+            "companyCount": 45,
+            "ticsId": 209,
+            "displayValue": "310조 6,978억",
+            "value": 3.1069789289844044E14
+          },
+          {
+            "baseDate": "2026-04-03",
+            "baseDateTime": "2026-04-03T08:00:00",
+            "fiscalPeriod": "Q",
+            "type": {"code": 3, "displayName": "매출"},
+            "ranking": 8,
+            "companyCount": 45,
+            "ticsId": 209,
+            "displayValue": "20조 238억",
+            "value": 2.00238592E13
+          },
+          {
+            "baseDate": "2026-04-03",
+            "baseDateTime": "2026-04-03T08:00:00",
+            "fiscalPeriod": "Q",
+            "type": {"code": 4, "displayName": "영업이익률"},
+            "ranking": 3,
+            "companyCount": 45,
+            "ticsId": 209,
+            "displayValue": "40.7%",
+            "value": 40.731189
+          }
+        ]
+      }
+    ],
+    "minorList": []
+  }
+}

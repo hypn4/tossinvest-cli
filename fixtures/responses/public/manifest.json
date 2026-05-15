@@ -124,6 +124,11 @@
       "file": "sales-compositions-sndk.json",
       "url": "https://wts-info-api.tossinvest.com/api/v1/companies/NAS116LTR-E0/sales-compositions",
       "method": "GET"
+    },
+    {
+      "file": "tics-sndk.json",
+      "url": "https://wts-info-api.tossinvest.com/api/v2/companies/NAS116LTR-E0/tics",
+      "method": "GET"
     }
   ]
 }

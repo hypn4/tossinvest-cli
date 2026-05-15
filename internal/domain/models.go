@@ -542,3 +542,31 @@ type SalesCompositionItem struct {
 	Product  string  `json:"product,omitempty"`
 	Ratio    float64 `json:"ratio"`
 }
+
+type TICSIndustry struct {
+	ProductCode string      `json:"productCode"`
+	CompanyCode string      `json:"companyCode"`
+	BaseDate    string      `json:"baseDate"`
+	Major       []TICSEntry `json:"major"`
+	Minor       []TICSEntry `json:"minor"`
+	FetchedAt   time.Time   `json:"fetchedAt"`
+}
+
+type TICSEntry struct {
+	ID             int           `json:"id"`
+	Title          string        `json:"title"`
+	Description    string        `json:"description"`
+	CompanyCount   int           `json:"companyCount"`
+	Representative bool          `json:"representative"`
+	Rankings       []TICSRanking `json:"rankings"`
+}
+
+type TICSRanking struct {
+	BaseDate     string  `json:"baseDate"`
+	FiscalPeriod string  `json:"fiscalPeriod"`
+	TypeName     string  `json:"typeName"`     // 시가총액|매출|영업이익률
+	Ranking      int     `json:"ranking"`
+	CompanyCount int     `json:"companyCount"`
+	DisplayValue string  `json:"displayValue"`
+	Value        float64 `json:"value"`
+}

@@ -148,6 +148,32 @@ Examples:
 		},
 	}
 
-	cmd.AddCommand(infoCmd, overviewCmd, indicatorsCmd, valuationCmd, revenueCmd)
+	peersCmd := &cobra.Command{
+		Use:   "peers <symbol>",
+		Short: "TICS industry classification + peer rankings within industry",
+		Long: `Fetch the TICS industry taxonomy and per-metric peer rankings
+from /api/v2/companies/{companyCode}/tics.
+
+Each industry block lists the company's rank within that industry for
+시가총액 / 매출 / 영업이익률 (most recent fiscal period).
+
+Examples:
+  tossctl stock peers SNDK
+  tossctl stock peers NAS0250224006 --output json`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			app, err := newAppContext(opts)
+			if err != nil {
+				return err
+			}
+			ind, err := app.client.GetTICSIndustry(cmd.Context(), args[0])
+			if err != nil {
+				return userFacingCommandError(err)
+			}
+			return output.WriteTICSIndustry(cmd.OutOrStdout(), app.format, ind)
+		},
+	}
+
+	cmd.AddCommand(infoCmd, overviewCmd, indicatorsCmd, valuationCmd, revenueCmd, peersCmd)
 	return cmd
 }
