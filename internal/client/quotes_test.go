@@ -143,6 +143,81 @@ func TestGetTicks(t *testing.T) {
 	}
 }
 
+func TestStreamOrderBookEmitsOnHashChange(t *testing.T) {
+	t.Parallel()
+
+	root := fixtureRoot(t)
+	stockInfo := mustReadFile(t, filepath.Join(root, "stock-info.json"))
+
+	bodies := [][]byte{
+		[]byte(`{"result":{"close":167.10,"closeKrw":249000,
+			"offerPrices":[167.20],"offerPricesKrw":[249100],"offerVolumes":[30],
+			"bidPrices":[167.05],"bidPricesKrw":[248950],"bidVolumes":[87],
+			"offerVolume":30,"bidVolume":87}}`),
+		[]byte(`{"result":{"close":167.10,"closeKrw":249000,
+			"offerPrices":[167.20],"offerPricesKrw":[249100],"offerVolumes":[30],
+			"bidPrices":[167.05],"bidPricesKrw":[248950],"bidVolumes":[87],
+			"offerVolume":30,"bidVolume":87}}`),
+		[]byte(`{"result":{"close":167.10,"closeKrw":249000,
+			"offerPrices":[167.20],"offerPricesKrw":[249100],"offerVolumes":[40],
+			"bidPrices":[167.05],"bidPricesKrw":[248950],"bidVolumes":[87],
+			"offerVolume":40,"bidVolume":87}}`),
+	}
+
+	var calls atomic.Int32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case strings.HasPrefix(r.URL.Path, "/api/v2/stock-infos/"):
+			w.Write(stockInfo)
+		case strings.HasSuffix(r.URL.Path, "/quotes"):
+			idx := int(calls.Add(1)) - 1
+			if idx >= len(bodies) {
+				idx = len(bodies) - 1
+			}
+			w.Write(bodies[idx])
+		default:
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+	}))
+	defer server.Close()
+
+	c := New(Config{HTTPClient: server.Client(), InfoBaseURL: server.URL})
+
+	stream, err := c.StreamOrderBook(StreamOrderBookOptions{
+		Symbol:   "US20100311002",
+		Interval: 1,
+	})
+	if err != nil {
+		t.Fatalf("StreamOrderBook error: %v", err)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	emitted := []domain.OrderBook{}
+
+	go func() {
+		defer cancel()
+		for book := range stream.Books() {
+			emitted = append(emitted, book)
+			if len(emitted) == 2 {
+				time.Sleep(20 * time.Millisecond)
+				stream.Close()
+				return
+			}
+		}
+	}()
+
+	if err := stream.Run(ctx); err != nil && err != context.Canceled {
+		t.Fatalf("Run returned %v", err)
+	}
+
+	if len(emitted) != 2 {
+		t.Fatalf("expected 2 emits, got %d: %+v", len(emitted), emitted)
+	}
+	if emitted[0].Offers[0].Volume != 30 || emitted[1].Offers[0].Volume != 40 {
+		t.Fatalf("unexpected emit volumes: %+v", emitted)
+	}
+}
+
 func TestStreamTicksDedupsByCumulativeVolume(t *testing.T) {
 	t.Parallel()
 
