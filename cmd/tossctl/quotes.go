@@ -22,22 +22,47 @@ func newQuotesCmd(opts *rootOptions) *cobra.Command {
 		Short: "Read orderbook and tick data",
 	}
 
+	var (
+		bookFollow   bool
+		bookInterval time.Duration
+	)
 	bookCmd := &cobra.Command{
 		Use:   "book <symbol>",
-		Short: "Show the latest orderbook (호가창)",
-		Args:  cobra.ExactArgs(1),
+		Short: "Show the latest orderbook (호가창); --follow for NDJSON stream",
+		Long: `Show the latest orderbook for a symbol.
+
+Without --follow this prints a snapshot.
+
+With --follow this becomes a long-running stream: every --interval (default 1s)
+the orderbook is re-fetched and a snapshot is emitted as NDJSON whenever any
+price or volume across all levels changes. Use Ctrl-C to stop.
+
+Toss exposes no WebSocket/SSE for the orderbook; --follow is REST polling.
+During closed market hours the orderbook does not change so no lines are
+emitted; this is intentional.
+
+Examples:
+  tossctl quotes book SOXL
+  tossctl quotes book SOXL --follow --interval 1s
+  tossctl quotes book A005930 --follow`,
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			app, err := newAppContext(opts)
 			if err != nil {
 				return err
 			}
-			book, err := app.client.GetOrderBook(cmd.Context(), args[0])
-			if err != nil {
-				return userFacingCommandError(err)
+			if !bookFollow {
+				book, err := app.client.GetOrderBook(cmd.Context(), args[0])
+				if err != nil {
+					return userFacingCommandError(err)
+				}
+				return output.WriteOrderBook(cmd.OutOrStdout(), app.format, book)
 			}
-			return output.WriteOrderBook(cmd.OutOrStdout(), app.format, book)
+			return runBookFollow(cmd.Context(), app, args[0], bookInterval, cmd.OutOrStdout(), cmd.ErrOrStderr())
 		},
 	}
+	bookCmd.Flags().BoolVar(&bookFollow, "follow", false, "Stream orderbook updates as NDJSON until Ctrl-C")
+	bookCmd.Flags().DurationVar(&bookInterval, "interval", 1*time.Second, "Poll interval when --follow is set")
 
 	var (
 		ticksCount    int
@@ -118,6 +143,44 @@ func runTicksFollow(ctx context.Context, app *appContext, symbol string, count i
 				return userFacingCommandError(err)
 			}
 			if err := output.WriteTickNDJSON(stdout, tick); err != nil {
+				stream.Close()
+				return err
+			}
+		}
+	}
+}
+
+func runBookFollow(ctx context.Context, app *appContext, symbol string, interval time.Duration, stdout, stderr io.Writer) error {
+	stream, err := app.client.StreamOrderBook(client.StreamOrderBookOptions{
+		Symbol:   symbol,
+		Interval: interval,
+		OnError: func(err error) {
+			fmt.Fprintf(stderr, "orderbook poll error: %v\n", err)
+		},
+	})
+	if err != nil {
+		return userFacingCommandError(err)
+	}
+
+	sigCtx, cancel := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
+	defer cancel()
+
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- stream.Run(sigCtx)
+	}()
+
+	for {
+		select {
+		case book, ok := <-stream.Books():
+			if !ok {
+				err := <-errCh
+				if err == nil || errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+					return nil
+				}
+				return userFacingCommandError(err)
+			}
+			if err := output.WriteOrderBookNDJSON(stdout, book); err != nil {
 				stream.Close()
 				return err
 			}

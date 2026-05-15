@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/junghoonkye/tossinvest-cli/internal/domain"
@@ -244,4 +245,123 @@ func chartProductPrefix(marketCode, productCode string) string {
 		return "kr-s"
 	}
 	return "us-s"
+}
+
+// StreamChartOptions controls a long-running chart poll.
+type StreamChartOptions struct {
+	Symbol    string
+	Timeframe string        // alias: 1m/3m/5m/10m/15m/30m/1h/1d/1w/1mo/3mo/1y
+	Count     int           // candles to request per poll; default 2 (current + previous bucket)
+	Interval  time.Duration // poll cadence; default 60s
+	Session   string        // optional session filter
+	OnError   func(error)   // non-fatal error sink
+}
+
+// ChartStream drives a chart poll loop and emits new or updated candles
+// oldest-first. Dedup state: per-dt (close, volume); identical (dt,close,volume)
+// across polls produces no emit.
+type ChartStream struct {
+	client   *Client
+	opts     StreamChartOptions
+	out      chan domain.Candle
+	stopOnce sync.Once
+	stop     chan struct{}
+	seen     map[string]candleHash
+}
+
+type candleHash struct {
+	close  float64
+	volume float64
+}
+
+const chartSeenCap = 32
+
+// StreamChart builds a ChartStream; call Run(ctx) to drive it.
+func (c *Client) StreamChart(opts StreamChartOptions) (*ChartStream, error) {
+	if strings.TrimSpace(opts.Symbol) == "" {
+		return nil, fmt.Errorf("StreamChart: symbol is required")
+	}
+	if opts.Count <= 0 {
+		opts.Count = 2
+	}
+	if opts.Interval <= 0 {
+		opts.Interval = 60 * time.Second
+	}
+	return &ChartStream{
+		client: c,
+		opts:   opts,
+		out:    make(chan domain.Candle, opts.Count*4),
+		stop:   make(chan struct{}),
+		seen:   make(map[string]candleHash, chartSeenCap),
+	}, nil
+}
+
+// Ticks returns the channel callers consume. Method name kept symmetrical with
+// TickStream so consumer patterns transfer; the channel element type signals
+// what's actually flowing.
+func (s *ChartStream) Ticks() <-chan domain.Candle { return s.out }
+
+// Close stops the stream loop. Safe to call multiple times.
+func (s *ChartStream) Close() {
+	s.stopOnce.Do(func() { close(s.stop) })
+}
+
+// Run polls until ctx is cancelled or Close is called.
+func (s *ChartStream) Run(ctx context.Context) error {
+	defer close(s.out)
+	timer := time.NewTimer(0)
+	defer timer.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-s.stop:
+			return nil
+		case <-timer.C:
+			chart, err := s.client.GetChart(ctx, s.opts.Symbol, ChartOptions{
+				Timeframe: s.opts.Timeframe,
+				Count:     s.opts.Count,
+				Session:   s.opts.Session,
+			})
+			if err != nil {
+				if s.opts.OnError != nil {
+					s.opts.OnError(err)
+				}
+			} else {
+				s.emit(chart)
+			}
+			timer.Reset(s.opts.Interval)
+		}
+	}
+}
+
+// emit iterates candles oldest-first and emits any whose (dt, close, volume)
+// hash differs from the previously-seen value (or is new). The seen map is
+// pruned to the current snapshot whenever it grows beyond chartSeenCap.
+func (s *ChartStream) emit(chart domain.Chart) {
+	for i := len(chart.Candles) - 1; i >= 0; i-- {
+		c := chart.Candles[i]
+		h := candleHash{close: c.Close, volume: c.Volume}
+		if prev, ok := s.seen[c.DateTime]; ok && prev == h {
+			continue
+		}
+		s.seen[c.DateTime] = h
+		select {
+		case s.out <- c:
+		case <-s.stop:
+			return
+		}
+	}
+	if len(s.seen) > chartSeenCap {
+		keep := make(map[string]bool, len(chart.Candles))
+		for _, c := range chart.Candles {
+			keep[c.DateTime] = true
+		}
+		for dt := range s.seen {
+			if !keep[dt] {
+				delete(s.seen, dt)
+			}
+		}
+	}
 }

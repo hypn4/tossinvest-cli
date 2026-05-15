@@ -124,3 +124,27 @@ func TestWriteTickNDJSON(t *testing.T) {
 		t.Fatalf("unexpected first tick: %+v", first)
 	}
 }
+
+func TestWriteOrderBookNDJSON(t *testing.T) {
+	var buf bytes.Buffer
+	book := domain.OrderBook{
+		ProductCode: "US20100311002",
+		Last:        167.10,
+		Offers:      []domain.OrderBookLevel{{Price: 167.20, Volume: 30}},
+		Bids:        []domain.OrderBookLevel{{Price: 167.05, Volume: 87}},
+	}
+	if err := WriteOrderBookNDJSON(&buf, book); err != nil {
+		t.Fatalf("error: %v", err)
+	}
+	line := strings.TrimRight(buf.String(), "\n")
+	if strings.Contains(line, "\n") {
+		t.Fatalf("expected single-line NDJSON, got: %q", buf.String())
+	}
+	var parsed domain.OrderBook
+	if err := json.Unmarshal([]byte(line), &parsed); err != nil {
+		t.Fatalf("not valid JSON: %v", err)
+	}
+	if parsed.ProductCode != "US20100311002" {
+		t.Fatalf("unexpected book: %+v", parsed)
+	}
+}

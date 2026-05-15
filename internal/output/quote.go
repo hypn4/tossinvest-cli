@@ -197,3 +197,17 @@ func WriteQuotes(w io.Writer, format Format, quotes []domain.Quote) error {
 func formatFloat(value float64) string {
 	return strconv.FormatFloat(value, 'f', -1, 64)
 }
+
+// WriteQuoteNDJSON writes a single quote snapshot as one JSON object terminated
+// by '\n'. Used by `tossctl quote get --follow`.
+func WriteQuoteNDJSON(w io.Writer, quote domain.Quote) error {
+	data, err := json.Marshal(quote)
+	if err != nil {
+		return err
+	}
+	if _, err := w.Write(data); err != nil {
+		return err
+	}
+	_, err = w.Write([]byte{'\n'})
+	return err
+}

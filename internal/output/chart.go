@@ -115,6 +115,21 @@ func nonEmptyOr(value, fallback string) string {
 	return value
 }
 
+// WriteCandleNDJSON writes a single candle as one JSON object terminated by '\n'.
+// Used by `tossctl chart get --follow` so downstream consumers (jq, LLM
+// pipelines) can read each candle update as a stream of independent objects.
+func WriteCandleNDJSON(w io.Writer, candle domain.Candle) error {
+	data, err := json.Marshal(candle)
+	if err != nil {
+		return err
+	}
+	if _, err := w.Write(data); err != nil {
+		return err
+	}
+	_, err = w.Write([]byte{'\n'})
+	return err
+}
+
 func formatVolume(v float64) string {
 	if v == 0 {
 		return "-"

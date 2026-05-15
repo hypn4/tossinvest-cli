@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/junghoonkye/tossinvest-cli/internal/domain"
@@ -345,4 +346,90 @@ func firstNonEmpty(values ...string) string {
 		}
 	}
 	return ""
+}
+
+// StreamQuoteOptions controls a long-running quote poll.
+type StreamQuoteOptions struct {
+	Symbol   string
+	Interval time.Duration // default 3s
+	OnError  func(error)
+}
+
+// QuoteStream drives a quote poll loop and emits a snapshot whenever the
+// (last, volume) tuple changes. FetchedAt is a client-side timestamp and is
+// not part of the dedup key.
+type QuoteStream struct {
+	client    *Client
+	opts      StreamQuoteOptions
+	out       chan domain.Quote
+	stopOnce  sync.Once
+	stop      chan struct{}
+	lastPrice float64
+	lastVol   float64
+	hasLast   bool
+}
+
+// StreamQuote builds a QuoteStream; call Run(ctx) to drive it.
+func (c *Client) StreamQuote(opts StreamQuoteOptions) (*QuoteStream, error) {
+	if strings.TrimSpace(opts.Symbol) == "" {
+		return nil, fmt.Errorf("StreamQuote: symbol is required")
+	}
+	if opts.Interval <= 0 {
+		opts.Interval = 3 * time.Second
+	}
+	return &QuoteStream{
+		client: c,
+		opts:   opts,
+		out:    make(chan domain.Quote, 4),
+		stop:   make(chan struct{}),
+	}, nil
+}
+
+// Quotes returns the channel callers consume.
+func (s *QuoteStream) Quotes() <-chan domain.Quote { return s.out }
+
+// Close stops the stream loop. Safe to call multiple times.
+func (s *QuoteStream) Close() {
+	s.stopOnce.Do(func() { close(s.stop) })
+}
+
+// Run polls until ctx is cancelled or Close is called.
+func (s *QuoteStream) Run(ctx context.Context) error {
+	defer close(s.out)
+	timer := time.NewTimer(0)
+	defer timer.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-s.stop:
+			return nil
+		case <-timer.C:
+			q, err := s.client.GetQuote(ctx, s.opts.Symbol)
+			if err != nil {
+				if s.opts.OnError != nil {
+					s.opts.OnError(err)
+				}
+			} else {
+				s.emit(q)
+			}
+			timer.Reset(s.opts.Interval)
+		}
+	}
+}
+
+// emit emits the snapshot when (last, volume) differs from the previous
+// emission (or is the first emission).
+func (s *QuoteStream) emit(q domain.Quote) {
+	if s.hasLast && q.Last == s.lastPrice && q.Volume == s.lastVol {
+		return
+	}
+	s.lastPrice = q.Last
+	s.lastVol = q.Volume
+	s.hasLast = true
+	select {
+	case s.out <- q:
+	case <-s.stop:
+	}
 }

@@ -2,7 +2,10 @@ package client
 
 import (
 	"context"
+	"encoding/binary"
 	"fmt"
+	"hash/fnv"
+	"math"
 	"net/url"
 	"sort"
 	"strconv"
@@ -235,4 +238,113 @@ func (s *TickStream) emit(snapshot []domain.Tick) {
 			return
 		}
 	}
+}
+
+// StreamOrderBookOptions controls a long-running orderbook poll.
+type StreamOrderBookOptions struct {
+	Symbol   string
+	Interval time.Duration // default 1s
+	OnError  func(error)
+}
+
+// OrderBookStream drives an orderbook poll loop and emits a snapshot whenever
+// the hash of (offerPrices, offerVolumes, bidPrices, bidVolumes) changes.
+type OrderBookStream struct {
+	client   *Client
+	opts     StreamOrderBookOptions
+	out      chan domain.OrderBook
+	stopOnce sync.Once
+	stop     chan struct{}
+	lastHash uint64
+	hasLast  bool
+}
+
+// StreamOrderBook builds an OrderBookStream; call Run(ctx) to drive it.
+func (c *Client) StreamOrderBook(opts StreamOrderBookOptions) (*OrderBookStream, error) {
+	if strings.TrimSpace(opts.Symbol) == "" {
+		return nil, fmt.Errorf("StreamOrderBook: symbol is required")
+	}
+	if opts.Interval <= 0 {
+		opts.Interval = 1 * time.Second
+	}
+	return &OrderBookStream{
+		client: c,
+		opts:   opts,
+		out:    make(chan domain.OrderBook, 4),
+		stop:   make(chan struct{}),
+	}, nil
+}
+
+// Books returns the channel callers consume.
+func (s *OrderBookStream) Books() <-chan domain.OrderBook { return s.out }
+
+// Close stops the stream loop. Safe to call multiple times.
+func (s *OrderBookStream) Close() {
+	s.stopOnce.Do(func() { close(s.stop) })
+}
+
+// Run polls until ctx is cancelled or Close is called.
+func (s *OrderBookStream) Run(ctx context.Context) error {
+	defer close(s.out)
+	timer := time.NewTimer(0)
+	defer timer.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-s.stop:
+			return nil
+		case <-timer.C:
+			book, err := s.client.GetOrderBook(ctx, s.opts.Symbol)
+			if err != nil {
+				if s.opts.OnError != nil {
+					s.opts.OnError(err)
+				}
+			} else {
+				s.emit(book)
+			}
+			timer.Reset(s.opts.Interval)
+		}
+	}
+}
+
+// emit hashes the orderbook levels and emits the snapshot when the hash differs
+// from the previous emission (or is the first emission).
+func (s *OrderBookStream) emit(book domain.OrderBook) {
+	h := hashOrderBook(book)
+	if s.hasLast && h == s.lastHash {
+		return
+	}
+	s.lastHash = h
+	s.hasLast = true
+	select {
+	case s.out <- book:
+	case <-s.stop:
+	}
+}
+
+// hashOrderBook produces a stable hash of the price/volume vectors. FNV-1a 64
+// keeps the implementation dependency-free; collisions are negligible at this
+// payload size. Levels are sorted by price before hashing so the hash is
+// invariant under any server-side reordering of the same book.
+func hashOrderBook(book domain.OrderBook) uint64 {
+	h := fnv.New64a()
+	var buf [8]byte
+	hashLevels := func(levels []domain.OrderBookLevel) {
+		sorted := append([]domain.OrderBookLevel(nil), levels...)
+		sort.SliceStable(sorted, func(i, j int) bool {
+			return sorted[i].Price < sorted[j].Price
+		})
+		for _, lvl := range sorted {
+			binary.BigEndian.PutUint64(buf[:], math.Float64bits(lvl.Price))
+			h.Write(buf[:])
+			binary.BigEndian.PutUint64(buf[:], math.Float64bits(lvl.Volume))
+			h.Write(buf[:])
+		}
+		h.Write([]byte{0xff})
+	}
+	hashLevels(book.Offers)
+	hashLevels(book.Bids)
+	return h.Sum64()
 }
