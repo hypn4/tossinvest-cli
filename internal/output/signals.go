@@ -106,3 +106,38 @@ func WriteSignalDetail(w io.Writer, format Format, detail domain.SignalDetail) e
 		return fmt.Errorf("unsupported output format: %s", format)
 	}
 }
+
+// WriteEventSignals renders scheduled event signals (earnings, disclosure, ...).
+func WriteEventSignals(w io.Writer, format Format, events []domain.EventSignal) error {
+	switch format {
+	case FormatJSON:
+		encoder := json.NewEncoder(w)
+		encoder.SetIndent("", "  ")
+		return encoder.Encode(events)
+	case FormatCSV:
+		writer := csv.NewWriter(w)
+		if err := writer.Write([]string{"product_code", "signal_label", "signal_info", "signal_id", "datetime"}); err != nil {
+			return err
+		}
+		for _, ev := range events {
+			if err := writer.Write([]string{
+				ev.ProductCode, ev.SignalLabel, ev.SignalInfo,
+				fmt.Sprintf("%d", ev.SignalID),
+				ev.DateTime.Format("2006-01-02T15:04:05Z07:00"),
+			}); err != nil {
+				return err
+			}
+		}
+		writer.Flush()
+		return writer.Error()
+	case FormatTable:
+		headers := []string{"CODE", "LABEL", "WHEN", "INFO"}
+		rows := make([][]string, 0, len(events))
+		for _, ev := range events {
+			rows = append(rows, []string{ev.ProductCode, ev.SignalLabel, ev.DateTime.Format("2006-01-02 15:04"), ev.SignalInfo})
+		}
+		return renderTable(w, headers, rows)
+	default:
+		return fmt.Errorf("unsupported output format: %s", format)
+	}
+}

@@ -93,3 +93,37 @@ func TestWriteSignalDetailTable(t *testing.T) {
 		}
 	}
 }
+
+var sampleEvents = []domain.EventSignal{
+	{
+		ProductCode: "US20190226001",
+		SignalLabel: "소식",
+		SignalInfo:  "실적이 발표됐어요. 2026년 3월 매출 $300.3만, 1주당 순이익 -$0.98",
+		SignalID:    6000000,
+		DateTime:    time.Date(2026, 5, 15, 20, 30, 0, 0, time.UTC),
+	},
+}
+
+func TestWriteEventSignalsJSON(t *testing.T) {
+	var buf bytes.Buffer
+	if err := WriteEventSignals(&buf, FormatJSON, sampleEvents); err != nil {
+		t.Fatalf("error: %v", err)
+	}
+	var parsed []domain.EventSignal
+	if err := json.Unmarshal(buf.Bytes(), &parsed); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if len(parsed) != 1 {
+		t.Fatalf("expected 1 event, got %d", len(parsed))
+	}
+}
+
+func TestWriteEventSignalsTable(t *testing.T) {
+	var buf bytes.Buffer
+	if err := WriteEventSignals(&buf, FormatTable, sampleEvents); err != nil {
+		t.Fatalf("error: %v", err)
+	}
+	if !strings.Contains(buf.String(), "실적이 발표됐어요") {
+		t.Fatalf("expected event info in output: %s", buf.String())
+	}
+}
