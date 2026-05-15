@@ -176,4 +176,61 @@ type Quote struct {
 	BadgeCount     int       `json:"badge_count,omitempty"`
 	NoticeCount    int       `json:"notice_count,omitempty"`
 	FetchedAt      time.Time `json:"fetched_at"`
+
+	Open             float64 `json:"open,omitempty"`
+	High             float64 `json:"high,omitempty"`
+	Low              float64 `json:"low,omitempty"`
+	Value            float64 `json:"value,omitempty"`
+	High52W          float64 `json:"high_52w,omitempty"`
+	Low52W           float64 `json:"low_52w,omitempty"`
+	High1Y           float64 `json:"high_1y,omitempty"`
+	Low1Y            float64 `json:"low_1y,omitempty"`
+	MarketCap        float64 `json:"market_cap,omitempty"`
+	TradingStrength  float64 `json:"trading_strength,omitempty"`
+	PreDayVolume     float64 `json:"pre_day_volume,omitempty"`
+	UpperLimit       float64 `json:"upper_limit,omitempty"`
+	LowerLimit       float64 `json:"lower_limit,omitempty"`
+	AfterMarketOpen  float64 `json:"after_market_open,omitempty"`
+	AfterMarketHigh  float64 `json:"after_market_high,omitempty"`
+	AfterMarketLow   float64 `json:"after_market_low,omitempty"`
+	AfterMarketClose float64 `json:"after_market_close,omitempty"`
+	LastKRW          float64 `json:"last_krw,omitempty"`
+	OpenKRW          float64 `json:"open_krw,omitempty"`
+	HighKRW          float64 `json:"high_krw,omitempty"`
+	LowKRW           float64 `json:"low_krw,omitempty"`
+	ReferencePriceKRW float64 `json:"reference_price_krw,omitempty"`
+	ValueKRW         float64 `json:"value_krw,omitempty"`
+	MarketCapKRW     float64 `json:"market_cap_krw,omitempty"`
+	GrossExpenseRatio float64 `json:"gross_expense_ratio,omitempty"`
+	DividendYieldRate float64 `json:"dividend_yield_rate,omitempty"`
+	TradingAmountRank int     `json:"trading_amount_rank,omitempty"`
+}
+
+type Candle struct {
+	DateTime    string  `json:"datetime"`
+	SessionType string  `json:"session_type,omitempty"`
+	Base        float64 `json:"base,omitempty"`
+	Open        float64 `json:"open"`
+	High        float64 `json:"high"`
+	Low         float64 `json:"low"`
+	Close       float64 `json:"close"`
+	Volume      float64 `json:"volume,omitempty"`
+	Amount      float64 `json:"amount,omitempty"`
+}
+
+type Chart struct {
+	ProductCode  string    `json:"product_code"`
+	Symbol       string    `json:"symbol,omitempty"`
+	Name         string    `json:"name,omitempty"`
+	Market       string    `json:"market,omitempty"`
+	Currency     string    `json:"currency,omitempty"`
+	Unit         string    `json:"unit"`
+	Step         int       `json:"step"`
+	Session      string    `json:"session,omitempty"`
+	InvestMode   string    `json:"invest_mode,omitempty"`
+	UseAdjusted  bool      `json:"use_adjusted_rate"`
+	ExchangeRate float64   `json:"exchange_rate,omitempty"`
+	NextDateTime string    `json:"next_datetime,omitempty"`
+	Candles      []Candle  `json:"candles"`
+	FetchedAt    time.Time `json:"fetched_at"`
 }
