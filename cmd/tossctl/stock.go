@@ -339,6 +339,37 @@ Examples:
 	statementsCmd.Flags().StringVar(&statementsFactor, "type", "INC", "Statement type: BAL (balance sheet), INC (income statement), CAS (cash flow)")
 	statementsCmd.Flags().StringVar(&statementsPeriod, "period", "Q", "Period granularity: Q (quarterly) or Y (annual)")
 
-	cmd.AddCommand(infoCmd, overviewCmd, indicatorsCmd, valuationCmd, revenueCmd, peersCmd, analystCmd, financialsCmd, dividendsCmd, estimatesCmd, statementsCmd)
+	ratiosCmd := &cobra.Command{
+		Use:   "ratios <symbol>",
+		Short: "Debt-ratio time series with components (총자본 + 총부채 + 부채비율 across 12 quarters)",
+		Long: `Fetch the financial-statements/comprehensive endpoint (POST {}).
+
+Default response: DEBT_RATIO factor, 분기 (Q) period, 3년 range — 3 line items
+(총자본 + 총부채 + 부채비율) × 12 periods.
+
+Toss's server also supports CURRENT_RATIO and INTEREST_COVERAGE_RATIO via
+selector body, plus 연간 (Y) period and 1년/5년/전체 ranges. PR14 ships only
+the empty-body default; --factor/--period flags will be added in a future PR
+after fresh captures verify those variants.
+
+Examples:
+  tossctl stock ratios SNDK
+  tossctl stock ratios NAS0250224006 --output json
+  tossctl stock ratios SNDK --output csv`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			app, err := newAppContext(opts)
+			if err != nil {
+				return err
+			}
+			ra, err := app.client.GetStockRatios(cmd.Context(), args[0])
+			if err != nil {
+				return userFacingCommandError(err)
+			}
+			return output.WriteStockRatios(cmd.OutOrStdout(), app.format, ra)
+		},
+	}
+
+	cmd.AddCommand(infoCmd, overviewCmd, indicatorsCmd, valuationCmd, revenueCmd, peersCmd, analystCmd, financialsCmd, dividendsCmd, estimatesCmd, statementsCmd, ratiosCmd)
 	return cmd
 }
