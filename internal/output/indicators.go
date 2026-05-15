@@ -73,7 +73,7 @@ func renderIndicatorSection(w io.Writer, name string, fields domain.IndicatorFie
 		}
 	case "배당":
 		pairs = []kv{
-			{"배당 주기", strOrDash(fields["dividendFrequency"])},
+			{"배당 주기", strVal(fields["dividendFrequency"])},
 			{"배당 수익률", fmtPctNum(fields["dividendYieldRatio"])},
 			{"연간 배당금", fmtUSDKRWOrDash(fields["annualCash"], fields["annualCashKrw"])},
 		}
@@ -109,13 +109,6 @@ func strVal(v any) string {
 	}
 }
 
-func strOrDash(v any) string {
-	if v == nil {
-		return "—"
-	}
-	return strVal(v)
-}
-
 func fmtUSDKRW(usdAny, krwAny any) string {
 	usd, _ := usdAny.(float64)
 	krw, _ := krwAny.(float64)
@@ -147,7 +140,7 @@ func sortedSectionNames(m map[string]domain.IndicatorFields) []string {
 	return out
 }
 
-func sortedMapKeys(m domain.IndicatorFields) []string {
+func sortedMapKeys[V any](m map[string]V) []string {
 	out := make([]string, 0, len(m))
 	for k := range m {
 		out = append(out, k)

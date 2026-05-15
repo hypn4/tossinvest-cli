@@ -25,7 +25,7 @@ func TestWriteStockIndicatorsTable(t *testing.T) {
 		t.Fatalf("WriteStockIndicators error: %v", err)
 	}
 	out := buf.String()
-	for _, want := range []string{"NAS0250224006", "가치평가", "PER", "45.4배", "수익", "EPS", "$28.76", "ROE", "39.3%", "배당", "0.00%"} {
+	for _, want := range []string{"NAS0250224006", "가치평가", "PER", "45.4배", "수익", "EPS", "$28.76", "ROE", "39.3%", "배당", "0.00%", "연간 배당금", "—"} {
 		if !strings.Contains(out, want) {
 			t.Fatalf("output missing %q\nfull:\n%s", want, out)
 		}
