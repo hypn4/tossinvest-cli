@@ -6,6 +6,8 @@ import (
 	"net/url"
 	"sort"
 	"strconv"
+	"strings"
+	"sync"
 	"time"
 
 	"github.com/junghoonkye/tossinvest-cli/internal/domain"
@@ -141,4 +143,96 @@ func (c *Client) GetTicks(ctx context.Context, symbol string, count int) ([]doma
 		})
 	}
 	return out, nil
+}
+
+// StreamTicksOptions controls a long-running tick stream.
+type StreamTicksOptions struct {
+	Symbol   string
+	Count    int           // request size each poll; default 50
+	Interval time.Duration // poll cadence; default 2s
+	Since    float64       // resume from this cumulativeVolume (exclusive); 0 emits the initial snapshot
+	OnError  func(error)   // optional non-fatal error sink; default discards
+}
+
+// TickStream drives a tick poll loop and emits new ticks oldest-first.
+type TickStream struct {
+	client   *Client
+	opts     StreamTicksOptions
+	out      chan domain.Tick
+	stopOnce sync.Once
+	stop     chan struct{}
+	cursor   float64
+}
+
+// StreamTicks builds a TickStream; call Run(ctx) to drive it.
+func (c *Client) StreamTicks(opts StreamTicksOptions) (*TickStream, error) {
+	if strings.TrimSpace(opts.Symbol) == "" {
+		return nil, fmt.Errorf("StreamTicks: symbol is required")
+	}
+	if opts.Count <= 0 {
+		opts.Count = 50
+	}
+	if opts.Interval <= 0 {
+		opts.Interval = 2 * time.Second
+	}
+	return &TickStream{
+		client: c,
+		opts:   opts,
+		out:    make(chan domain.Tick, opts.Count),
+		stop:   make(chan struct{}),
+		cursor: opts.Since,
+	}, nil
+}
+
+// Ticks returns the channel callers consume.
+func (s *TickStream) Ticks() <-chan domain.Tick { return s.out }
+
+// Close stops the stream loop. Safe to call multiple times.
+func (s *TickStream) Close() {
+	s.stopOnce.Do(func() { close(s.stop) })
+}
+
+// Run polls until ctx is cancelled or Close is called. It blocks; emit loops
+// should run it in a goroutine.
+func (s *TickStream) Run(ctx context.Context) error {
+	defer close(s.out)
+	timer := time.NewTimer(0) // fire immediately for first poll
+	defer timer.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-s.stop:
+			return nil
+		case <-timer.C:
+			ticks, err := s.client.GetTicks(ctx, s.opts.Symbol, s.opts.Count)
+			if err != nil {
+				if s.opts.OnError != nil {
+					s.opts.OnError(err)
+				}
+			} else {
+				s.emit(ticks)
+			}
+			timer.Reset(s.opts.Interval)
+		}
+	}
+}
+
+// emit converts the newest-first snapshot into chronological NDJSON-friendly
+// order and advances the cumulativeVolume cursor.
+func (s *TickStream) emit(snapshot []domain.Tick) {
+	// Snapshot is newest→oldest; iterate in reverse for chronological emit.
+	for i := len(snapshot) - 1; i >= 0; i-- {
+		tick := snapshot[i]
+		if tick.CumulativeVolume <= s.cursor {
+			continue
+		}
+		select {
+		case s.out <- tick:
+			s.cursor = tick.CumulativeVolume
+		case <-s.stop:
+			return
+		}
+	}
 }

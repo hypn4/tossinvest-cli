@@ -7,7 +7,11 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync/atomic"
 	"testing"
+	"time"
+
+	"github.com/junghoonkye/tossinvest-cli/internal/domain"
 )
 
 func fixtureRoot(t *testing.T) string {
@@ -126,5 +130,70 @@ func TestGetTicks(t *testing.T) {
 	}
 	if ticks[0].TradeType != "SELL" || ticks[1].TradeType != "BUY" {
 		t.Fatalf("trade type decoding broken: %+v", ticks[:2])
+	}
+}
+
+func TestStreamTicksDedupsByCumulativeVolume(t *testing.T) {
+	t.Parallel()
+
+	root := fixtureRoot(t)
+	var calls atomic.Int32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.URL.Path == "/api/v2/stock-infos/US20100311002":
+			http.ServeFile(w, r, filepath.Join(root, "stock-info.json"))
+		case r.URL.Path == "/api/v2/stock-prices/US20100311002/ticks":
+			calls.Add(1)
+			http.ServeFile(w, r, filepath.Join(root, "ticks-us.json"))
+		default:
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+	}))
+	defer server.Close()
+
+	c := New(Config{HTTPClient: server.Client(), InfoBaseURL: server.URL})
+
+	emitted := []domain.Tick{}
+	stream, err := c.StreamTicks(StreamTicksOptions{
+		Symbol:   "US20100311002",
+		Count:    3,
+		Interval: 1, // 1ns — effectively immediate; we drive iterations with ctx cancel
+		Since:    0,
+		OnError:  nil,
+	})
+	if err != nil {
+		t.Fatalf("StreamTicks returned error: %v", err)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+
+	go func() {
+		defer cancel()
+		// Drain the first emit (3 ticks) then trigger a second poll that should emit zero new ticks.
+		first := 0
+		for tick := range stream.Ticks() {
+			emitted = append(emitted, tick)
+			first++
+			if first == 3 {
+				// Allow one more poll cycle to confirm dedup; then stop.
+				time.Sleep(20 * time.Millisecond)
+				stream.Close()
+				return
+			}
+		}
+	}()
+
+	if err := stream.Run(ctx); err != nil && err != context.Canceled {
+		t.Fatalf("Run returned %v", err)
+	}
+
+	if len(emitted) != 3 {
+		t.Fatalf("expected 3 emitted ticks, got %d", len(emitted))
+	}
+	// Oldest-first ordering for downstream NDJSON
+	if emitted[0].CumulativeVolume != 1731778 || emitted[2].CumulativeVolume != 1731781 {
+		t.Fatalf("expected oldest-first order: %+v", emitted)
+	}
+	if calls.Load() < 2 {
+		t.Fatalf("expected at least 2 poll cycles, got %d", calls.Load())
 	}
 }
