@@ -21,6 +21,9 @@ All notable changes to this project will be documented in this file.
 - `tossctl options info <OPT_…>` — single-option metadata (strike, expiry, bid/ask/mid, OI, contract unit, liquidation countdown, halt/suspend flags) via `/api/v2/stock-infos/{OPT_…}` + `optionInstrument` decoding.
 - `tossctl options nearest-atm <underlying>` — nearest-expiry ATM option's OPT_ productCode via `/api/v1/option-infos/default-chart-option`.
 - `OPT_…` productCodes route through `chartProductPrefix` to the `us-o` chart family, so `tossctl chart get OPT_... --tf 15m` works unchanged.
+- `tossctl options expiries <underlying>` — list option expiry ladder via `/api/v1/option-maturity-date/get-all`.
+- `tossctl options chain <underlying> [--expiry] [--type call|put] [--with-prices]` — strike chain (call + put per strike) via `/api/v1/option-both-chain/get-all`; optional bulk-price join.
+- `tossctl options prices <codes>` — bulk option/stock prices via `/api/v2/stock-prices?codes=…` (lighter than `quote get`).
 
 ### Changed
 - `cmd/tossctl/chart.go`, `cmd/tossctl/quotes.go`, `cmd/tossctl/quote.go` long help text now documents that `--follow` is REST polling (no SSE/WebSocket from Toss) and that closed-market silence is correct behavior.
