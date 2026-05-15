@@ -1,0 +1,61 @@
+{
+  "date": {
+    "result": {
+      "announceAt": null,
+      "revenueEst": 7736730000.0,
+      "revenueEstKrw": 11567185023000.0,
+      "epsEst": 31.979,
+      "epsEstKrw": 47811.8029,
+      "operatingIncomeEst": null,
+      "operatingIncomeEstKrw": null
+    }
+  },
+  "revenue": {
+    "result": {
+      "revenueEst": 7736730000.0,
+      "revenueEstKrw": 11567185023000.0,
+      "fluctuationRate": 26.52,
+      "fluctuation": 1247330000.0,
+      "fluctuationKrw": 1894444804000.0,
+      "position": "HIGH",
+      "graphs": [
+        {"period": "2025-06", "revenue": 1923000000.0, "revenueKrw": 2607132000000.0, "revenueEst": 1872000000.0, "revenueEstKrw": 2538013600000.0, "surprise": 2.72},
+        {"period": "2025-09", "revenue": 2308000000.0, "revenueKrw": 3243160800000.0, "revenueEst": 2210000000.0, "revenueEstKrw": 3105410800000.0, "surprise": 4.43},
+        {"period": "2025-12", "revenue": 2306000000.0, "revenueKrw": 3380840800000.0, "revenueEst": 2189000000.0, "revenueEstKrw": 3209357300000.0, "surprise": 5.34},
+        {"period": "2026-03", "revenue": 3092000000.0, "revenueKrw": 4699192000000.0, "revenueEst": 2440000000.0, "revenueEstKrw": 3708680000000.0, "surprise": 26.72}
+      ]
+    }
+  },
+  "eps": {
+    "result": {
+      "epsEst": 31.979,
+      "epsEstKrw": 47811.8029,
+      "fluctuationRate": 36.6,
+      "fluctuation": 8.569,
+      "fluctuationKrw": 12256.6949,
+      "position": "HIGH",
+      "graphs": [
+        {"period": "2025-06", "eps": 0.29, "epsKrw": 393.70, "epsEst": 0.041, "epsEstKrw": 55.66, "surprise": 607.32},
+        {"period": "2025-09", "eps": 1.22, "epsKrw": 1715.32, "epsEst": 0.927, "epsEstKrw": 1303.36, "surprise": 31.61},
+        {"period": "2025-12", "eps": 6.2, "epsKrw": 8896.38, "epsEst": 3.206, "epsEstKrw": 4600.29, "surprise": 93.39},
+        {"period": "2026-03", "eps": 23.41, "epsKrw": 35530.43, "epsEst": 11.5, "epsEstKrw": 17480.0, "surprise": 103.57}
+      ]
+    }
+  },
+  "operatingIncome": {
+    "result": {
+      "operatingIncomeEst": null,
+      "operatingIncomeEstKrw": null,
+      "fluctuationRate": 0,
+      "fluctuation": 0,
+      "fluctuationKrw": 0,
+      "position": null,
+      "graphs": [
+        {"period": "2025-06", "operatingIncome": 18000000.0, "operatingIncomeKrw": 24436800000.0, "operatingIncomeEst": null, "operatingIncomeEstKrw": null, "surprise": null},
+        {"period": "2025-09", "operatingIncome": 879000000.0, "operatingIncomeKrw": 1234950600000.0, "operatingIncomeEst": null, "operatingIncomeEstKrw": null, "surprise": null},
+        {"period": "2025-12", "operatingIncome": 1067000000.0, "operatingIncomeKrw": 1564265600000.0, "operatingIncomeEst": null, "operatingIncomeEstKrw": null, "surprise": null},
+        {"period": "2026-03", "operatingIncome": 4111000000.0, "operatingIncomeKrw": 6243786800000.0, "operatingIncomeEst": null, "operatingIncomeEstKrw": null, "surprise": null}
+      ]
+    }
+  }
+}

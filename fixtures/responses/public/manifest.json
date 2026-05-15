@@ -149,6 +149,11 @@
       "file": "stock-dividends-sndk.json",
       "url": "(combined yield-card+years+history fixture — empty case)",
       "method": "GET"
+    },
+    {
+      "file": "stock-estimates-sndk.json",
+      "url": "(combined estimate-date+revenue+eps+operating-income fixture for testing only)",
+      "method": "GET+POST"
     }
   ]
 }

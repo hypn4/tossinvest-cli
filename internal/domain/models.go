@@ -716,3 +716,80 @@ type DividendPayout struct {
 	YieldRatio    float64 `json:"yield_ratio"`
 	TTMYieldRatio float64 `json:"ttm_yield_ratio"`
 }
+
+type StockEstimates struct {
+	ProductCode     string                        `json:"product_code"`
+	Headline        EstimateHeadline              `json:"headline"`
+	Revenue         EstimateRevenueSeries         `json:"revenue"`
+	EPS             EstimateEpsSeries             `json:"eps"`
+	OperatingIncome EstimateOperatingIncomeSeries `json:"operating_income"`
+	FetchedAt       time.Time                     `json:"fetched_at"`
+}
+
+// EstimateHeadline is the consensus-summary card from GET .../financial/estimate/date.
+type EstimateHeadline struct {
+	AnnounceAt            *string  `json:"announce_at"`
+	RevenueEst            *float64 `json:"revenue_est"`
+	RevenueEstKrw         *float64 `json:"revenue_est_krw"`
+	EPSEst                *float64 `json:"eps_est"`
+	EPSEstKrw             *float64 `json:"eps_est_krw"`
+	OperatingIncomeEst    *float64 `json:"operating_income_est"`
+	OperatingIncomeEstKrw *float64 `json:"operating_income_est_krw"`
+}
+
+type EstimateRevenueSeries struct {
+	RevenueEst      *float64               `json:"revenue_est"`
+	RevenueEstKrw   *float64               `json:"revenue_est_krw"`
+	FluctuationRate float64                `json:"fluctuation_rate"`
+	Fluctuation     float64                `json:"fluctuation"`
+	FluctuationKrw  float64                `json:"fluctuation_krw"`
+	Position        *string                `json:"position"`
+	Graph           []EstimateRevenuePoint `json:"graph"`
+}
+
+type EstimateRevenuePoint struct {
+	Period        string   `json:"period"`
+	Revenue       *float64 `json:"revenue"`
+	RevenueEst    *float64 `json:"revenue_est"`
+	RevenueKrw    *float64 `json:"revenue_krw"`
+	RevenueEstKrw *float64 `json:"revenue_est_krw"`
+	Surprise      *float64 `json:"surprise"`
+}
+
+type EstimateEpsSeries struct {
+	EPSEst          *float64           `json:"eps_est"`
+	EPSEstKrw       *float64           `json:"eps_est_krw"`
+	FluctuationRate float64            `json:"fluctuation_rate"`
+	Fluctuation     float64            `json:"fluctuation"`
+	FluctuationKrw  float64            `json:"fluctuation_krw"`
+	Position        *string            `json:"position"`
+	Graph           []EstimateEpsPoint `json:"graph"`
+}
+
+type EstimateEpsPoint struct {
+	Period    string   `json:"period"`
+	EPS       *float64 `json:"eps"`
+	EPSEst    *float64 `json:"eps_est"`
+	EPSKrw    *float64 `json:"eps_krw"`
+	EPSEstKrw *float64 `json:"eps_est_krw"`
+	Surprise  *float64 `json:"surprise"`
+}
+
+type EstimateOperatingIncomeSeries struct {
+	OperatingIncomeEst    *float64                       `json:"operating_income_est"`
+	OperatingIncomeEstKrw *float64                       `json:"operating_income_est_krw"`
+	FluctuationRate       float64                        `json:"fluctuation_rate"`
+	Fluctuation           float64                        `json:"fluctuation"`
+	FluctuationKrw        float64                        `json:"fluctuation_krw"`
+	Position              *string                        `json:"position"`
+	Graph                 []EstimateOperatingIncomePoint `json:"graph"`
+}
+
+type EstimateOperatingIncomePoint struct {
+	Period                string   `json:"period"`
+	OperatingIncome       *float64 `json:"operating_income"`
+	OperatingIncomeEst    *float64 `json:"operating_income_est"`
+	OperatingIncomeKrw    *float64 `json:"operating_income_krw"`
+	OperatingIncomeEstKrw *float64 `json:"operating_income_est_krw"`
+	Surprise              *float64 `json:"surprise"`
+}
