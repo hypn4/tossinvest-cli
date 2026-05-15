@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"strconv"
 
 	"github.com/junghoonkye/tossinvest-cli/internal/domain"
@@ -93,7 +94,7 @@ func WriteStockStatements(w io.Writer, format Format, st domain.StockStatements)
 			row = append(row, label, name)
 			for _, p := range st.Periods {
 				v := valuesByPeriod[p.Period][ref.Item]
-				row = append(row, formatStatementValue(v, ref.Unit))
+				row = append(row, formatStatementValue(v))
 			}
 			rows[i] = row
 		}
@@ -117,12 +118,13 @@ func WriteStockStatements(w io.Writer, format Format, st domain.StockStatements)
 	}
 }
 
-func formatStatementValue(v *float64, unit string) string {
+func formatStatementValue(v *float64) string {
 	if v == nil {
 		return "—"
 	}
 	// Values come in as raw units (e.g. 1665.0 for $1.665B). Toss's web UI
 	// displays these as-is with comma separators — they are already in
-	// millions per the unitType (USD=USD millions).
-	return formatWithCommas(int64(*v))
+	// millions per the unitType (USD=USD millions). Round (not truncate) to
+	// match Toss's rendering for fractional millions.
+	return formatWithCommas(int64(math.Round(*v)))
 }
