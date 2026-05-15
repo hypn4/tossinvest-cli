@@ -28,14 +28,10 @@ func (c *Client) GetOrderableSummary(ctx context.Context) (domain.OrderableSumma
 	}
 
 	return domain.OrderableSummary{
-		OrderableKR: moneyOf(cached.KRkrw, cached.KRusd),
-		OrderableUS: moneyOf(cached.USkrw, cached.USusd),
+		OrderableKR: cached.KR,
+		OrderableUS: cached.US,
 		KR:          kr,
 		US:          us,
 		FetchedAt:   time.Now().UTC(),
 	}, nil
-}
-
-func moneyOf(krw, usd float64) domain.Money {
-	return domain.Money{KRW: krw, USD: usd}
 }
