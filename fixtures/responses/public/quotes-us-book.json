@@ -1,0 +1,14 @@
+{
+  "result": {
+    "close": 168.60,
+    "closeKrw": 251517,
+    "offerPrices": [168.79],
+    "offerPricesKrw": [251800],
+    "offerVolumes": [7],
+    "bidPrices": [168.60],
+    "bidPricesKrw": [251517],
+    "bidVolumes": [2],
+    "offerVolume": 7,
+    "bidVolume": 2
+  }
+}

@@ -234,3 +234,39 @@ type Chart struct {
 	Candles      []Candle  `json:"candles"`
 	FetchedAt    time.Time `json:"fetched_at"`
 }
+
+type OrderBookLevel struct {
+	Price    float64 `json:"price"`
+	PriceKRW float64 `json:"price_krw,omitempty"`
+	Volume   float64 `json:"volume"`
+}
+
+type OrderBook struct {
+	ProductCode     string           `json:"product_code"`
+	Symbol          string           `json:"symbol,omitempty"`
+	Name            string           `json:"name,omitempty"`
+	Market          string           `json:"market,omitempty"`
+	Currency        string           `json:"currency,omitempty"`
+	Last            float64          `json:"last,omitempty"`
+	LastKRW         float64          `json:"last_krw,omitempty"`
+	Offers          []OrderBookLevel `json:"offers"`
+	Bids            []OrderBookLevel `json:"bids"`
+	OfferVolumeSum  float64          `json:"offer_volume_sum,omitempty"`
+	BidVolumeSum    float64          `json:"bid_volume_sum,omitempty"`
+	SinglePrice     bool             `json:"single_price,omitempty"`
+	EstimatedPrice  float64          `json:"estimated_price,omitempty"`
+	EstimatedVolume float64          `json:"estimated_volume,omitempty"`
+	FetchedAt       time.Time        `json:"fetched_at"`
+}
+
+type Tick struct {
+	Time             string    `json:"time"`
+	ProductCode      string    `json:"product_code"`
+	Price            float64   `json:"price"`
+	PriceKRW         float64   `json:"price_krw,omitempty"`
+	Base             float64   `json:"base,omitempty"`
+	Volume           float64   `json:"volume"`
+	TradeType        string    `json:"trade_type"`
+	CumulativeVolume float64   `json:"cumulative_volume"`
+	FetchedAt        time.Time `json:"fetched_at,omitempty"`
+}

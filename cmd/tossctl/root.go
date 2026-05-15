@@ -103,6 +103,7 @@ func newRootCmd() *cobra.Command {
 		newWatchlistCmd(opts),
 		newQuoteCmd(opts),
 		newChartCmd(opts),
+		newQuotesCmd(opts),
 		newOrderCmd(opts),
 		newExportCmd(opts),
 		newPushCmd(opts),
