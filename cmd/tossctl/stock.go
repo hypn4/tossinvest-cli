@@ -204,6 +204,36 @@ Examples:
 		},
 	}
 
-	cmd.AddCommand(infoCmd, overviewCmd, indicatorsCmd, valuationCmd, revenueCmd, peersCmd, analystCmd)
+	financialsCmd := &cobra.Command{
+		Use:   "financials <symbol>",
+		Short: "Financial snapshot (stability + revenue/net-profit + operating-income)",
+		Long: `Fetch financial-snapshot endpoints behind the 종목정보 FINANCES section.
+
+Stitches three POST endpoints (each with empty body):
+  - /api/v2/stock-infos/stability/{code}        — 부채/유동/이자보상비율 + 업종 중앙값
+  - /api/v2/stock-infos/revenue-and-net-profit/{code} — 분기별 매출/순이익 시계열
+  - /api/v2/stock-infos/operating-income/{code} — 분기별 영업이익 시계열
+
+The graph arrays contain 12 quarters by default (Toss web fixed range).
+
+Examples:
+  tossctl stock financials SNDK
+  tossctl stock financials NAS0250224006 --output json
+  tossctl stock financials SNDK --output csv | column -t -s,`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			app, err := newAppContext(opts)
+			if err != nil {
+				return err
+			}
+			fin, err := app.client.GetStockFinancials(cmd.Context(), args[0])
+			if err != nil {
+				return userFacingCommandError(err)
+			}
+			return output.WriteStockFinancials(cmd.OutOrStdout(), app.format, fin)
+		},
+	}
+
+	cmd.AddCommand(infoCmd, overviewCmd, indicatorsCmd, valuationCmd, revenueCmd, peersCmd, analystCmd, financialsCmd)
 	return cmd
 }
