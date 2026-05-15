@@ -74,6 +74,11 @@
       "file": "compact-executed-us.json",
       "url": "https://wts-cert-api.tossinvest.com/api/v3/trading/orders/histories/compact/executed?productCode=US20100311002&timeUnit=thirty_minute&excludeSavings=false",
       "method": "GET"
+    },
+    {
+      "file": "stock-detail-ui-info-snxx.json",
+      "url": "https://wts-info-api.tossinvest.com/api/v1/stock-detail/ui/NAS0250224006/info",
+      "method": "GET"
     }
   ]
 }

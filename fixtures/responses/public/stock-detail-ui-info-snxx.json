@@ -1,0 +1,27 @@
+{
+  "result": {
+    "sections": [
+      {
+        "type": "OVERVIEW",
+        "data": {
+          "logoUrl": "https://static.toss.im/png-icons/securities/icn-sec-fill-SNDK.png",
+          "name": "샌디스크",
+          "subTitle": "미국|SNDK|나스닥",
+          "description": "SD카드, USB 플래시 드라이브 등의 메모리 제품을 판매하는 회사",
+          "link": "/companies/NAS116LTR-E0/",
+          "extraInfo": [],
+          "tics": {"baseDate": "2020-12-01T00:00:00", "major": [], "minor": []}
+        }
+      },
+      {
+        "type": "INDICATORS",
+        "data": {
+          "values": [
+            {"label":"시가총액","value":306146648589108,"displayValue":"306.1조원","dollarValue":204766670182,"displayDollarValue":"$2,047.7억","pointDate":"2026-05-14"},
+            {"label":"PER","value":45.43,"displayValue":"45.4배","dollarValue":null,"displayDollarValue":"45.4배","pointDate":"2026-05-14"}
+          ]
+        }
+      }
+    ]
+  }
+}
