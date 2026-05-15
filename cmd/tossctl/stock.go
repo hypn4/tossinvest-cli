@@ -41,6 +41,33 @@ Examples:
 		},
 	}
 
-	cmd.AddCommand(infoCmd)
+	overviewCmd := &cobra.Command{
+		Use:   "overview <symbol>",
+		Short: "Show the company overview card (CEO, EV, industry, description, listing)",
+		Long: `Fetch the company overview from /api/v2/stock-infos/{code}/overview.
+
+Returns the top-card of the 종목정보 deep tab: company name (KR + EN),
+CEO, industry, description, establish year, list date, shares outstanding,
+market value (USD + KRW), enterprise value (USD + KRW), homepage URL,
+data source attribution.
+
+Examples:
+  tossctl stock overview SNDK
+  tossctl stock overview NAS0250224006 --output json`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			app, err := newAppContext(opts)
+			if err != nil {
+				return err
+			}
+			ov, err := app.client.GetCompanyOverview(cmd.Context(), args[0])
+			if err != nil {
+				return userFacingCommandError(err)
+			}
+			return output.WriteCompanyOverview(cmd.OutOrStdout(), app.format, ov)
+		},
+	}
+
+	cmd.AddCommand(infoCmd, overviewCmd)
 	return cmd
 }
