@@ -25,6 +25,11 @@ All notable changes to this project will be documented in this file.
 - `tossctl options chain <underlying> [--expiry] [--type call|put] [--with-prices]` — strike chain (call + put per strike) via `/api/v1/option-both-chain/get-all`; optional bulk-price join.
 - `tossctl options prices <codes>` — bulk option/stock prices via `/api/v2/stock-prices?codes=…` (lighter than `quote get`).
 - `tossctl stock overview <symbol>` — company overview card (CEO, Enterprise Value KRW/USD, industry, description, listing, shares outstanding, homepage) via `/api/v2/stock-infos/{code}/overview`. Closes the EV + CEO gap previously documented in `stock-info-deep-tab.md`.
+- `tossctl stock indicators <symbol>` — investment indicators (PER/PBR/PSR, EPS/BPS/ROE, dividend summary, stability) via `/api/v1/stock-detail/ui/wts/{code}/investment-indicators`.
+- `tossctl stock valuation <symbol>` — per-stock PER/PBR/PSR vs industry median + HIGH/LOW/NORMAL position label and peer comparison table via `/api/v2/stock-infos/evaluation/{code}` + `/api/v2/stock-infos/evaluation-comparison/{code}` (both POST `{}`).
+- `tossctl stock revenue <symbol>` — revenue composition by business segment (latest fiscal period) via `/api/v1/companies/{companyCode}/sales-compositions`. CompanyCode is resolved internally through the overview endpoint.
+- `tossctl stock peers <symbol>` — TICS industry classification + per-metric peer rankings (시가총액 / 매출 / 영업이익률) via `/api/v2/companies/{companyCode}/tics`.
+- `tossctl stock analyst <symbol>` — analyst BUY/HOLD/SELL counts + consensus target price + past close history + report list via `/api/v1/stock-detail/ui/wts/{code}/analyst-opinion` + `/api/v2/stock-infos/consensus/{code}` + `/api/v1/stock-detail/ui/wts/{code}/analyst-reports`.
 
 ### Changed
 - `cmd/tossctl/chart.go`, `cmd/tossctl/quotes.go`, `cmd/tossctl/quote.go` long help text now documents that `--follow` is REST polling (no SSE/WebSocket from Toss) and that closed-market silence is correct behavior.
