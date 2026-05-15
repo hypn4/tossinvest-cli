@@ -24,6 +24,21 @@
     {
       "file": "chart-day-1.json",
       "url": "https://wts-info-api.tossinvest.com/api/v1/c-chart/kr-s/A005930/day:1?count=61&session=all&investMode=integrated&useAdjustedRate=true"
+    },
+    {
+      "file": "orderable-amount.json",
+      "url": "https://wts-cert-api.tossinvest.com/api/v1/dashboard/common/cached-orderable-amount",
+      "method": "GET"
+    },
+    {
+      "file": "transactions-overview-us.json",
+      "url": "https://wts-api.tossinvest.com/api/v3/my-assets/transactions/markets/us/overview",
+      "method": "GET"
+    },
+    {
+      "file": "transactions-overview-kr.json",
+      "url": "https://wts-api.tossinvest.com/api/v3/my-assets/transactions/markets/kr/overview",
+      "method": "GET"
     }
   ]
 }

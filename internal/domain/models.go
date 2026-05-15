@@ -180,17 +180,17 @@ type WithdrawableBottomSheetEntry struct {
 	USD   float64 `json:"usd,omitempty"`
 }
 
+type Money struct {
+	KRW float64 `json:"krw,omitempty"`
+	USD float64 `json:"usd,omitempty"`
+}
+
 type OrderableSummary struct {
-	OrderableKR domain_money        `json:"orderable_kr"`
-	OrderableUS domain_money        `json:"orderable_us"`
+	OrderableKR Money               `json:"orderable_kr"`
+	OrderableUS Money               `json:"orderable_us"`
 	KR          TransactionOverview `json:"kr_overview"`
 	US          TransactionOverview `json:"us_overview"`
 	FetchedAt   time.Time           `json:"fetched_at"`
-}
-
-type domain_money struct {
-	KRW float64 `json:"krw,omitempty"`
-	USD float64 `json:"usd,omitempty"`
 }
 
 type CompactExecution struct {
