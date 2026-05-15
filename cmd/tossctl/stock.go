@@ -157,6 +157,9 @@ from /api/v2/companies/{companyCode}/tics.
 Each industry block lists the company's rank within that industry for
 시가총액 / 매출 / 영업이익률 (most recent fiscal period).
 
+Table mode shows only major-industry entries; use --output json to also
+see minorList.
+
 Examples:
   tossctl stock peers SNDK
   tossctl stock peers NAS0250224006 --output json`,

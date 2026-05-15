@@ -1,9 +1,11 @@
 package output
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io"
+	"strconv"
 
 	"github.com/junghoonkye/tossinvest-cli/internal/domain"
 )
@@ -16,17 +18,22 @@ func WriteTICSIndustry(w io.Writer, format Format, ind domain.TICSIndustry) erro
 		enc.SetIndent("", "  ")
 		return enc.Encode(ind)
 	case FormatCSV:
-		if _, err := fmt.Fprintln(w, "industry_id,industry,base_date,metric,ranking,company_count,display_value"); err != nil {
+		cw := csv.NewWriter(w)
+		if err := cw.Write([]string{"industry_id", "industry", "base_date", "metric", "ranking", "company_count", "display_value"}); err != nil {
 			return err
 		}
 		for _, e := range ind.Major {
 			for _, r := range e.Rankings {
-				if _, err := fmt.Fprintf(w, "%d,%s,%s,%s,%d,%d,%s\n", e.ID, e.Title, r.BaseDate, r.TypeName, r.Ranking, r.CompanyCount, r.DisplayValue); err != nil {
+				if err := cw.Write([]string{
+					strconv.Itoa(e.ID), e.Title, r.BaseDate, r.TypeName,
+					strconv.Itoa(r.Ranking), strconv.Itoa(r.CompanyCount), r.DisplayValue,
+				}); err != nil {
 					return err
 				}
 			}
 		}
-		return nil
+		cw.Flush()
+		return cw.Error()
 	case FormatTable:
 		if _, err := fmt.Fprintf(w, "%s — TICS industry & peer ranking\n", ind.ProductCode); err != nil {
 			return err
