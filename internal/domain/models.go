@@ -449,3 +449,40 @@ type OptionPrice struct {
 	BaseKrwDecimal   float64 `json:"base_krw_decimal,omitempty"`
 	CloseKrwDecimal  float64 `json:"close_krw_decimal,omitempty"`
 }
+
+// CompanyOverview is the payload from /api/v2/stock-infos/{code}/overview.
+// Surfaces the top-card of the 종목정보 deep tab: CEO, EV, market value,
+// company description, industry classification, listing details.
+type CompanyOverview struct {
+	ProductCode        string         `json:"product_code"`
+	Type               string         `json:"type,omitempty"`
+	MarketCode         string         `json:"market_code,omitempty"`
+	Market             string         `json:"market,omitempty"`
+	ListDate           string         `json:"list_date,omitempty"`
+	MarketValue        float64        `json:"market_value,omitempty"`
+	MarketValueKrw     float64        `json:"market_value_krw,omitempty"`
+	EnterpriseValue    float64        `json:"enterprise_value,omitempty"`
+	EnterpriseValueKrw float64        `json:"enterprise_value_krw,omitempty"`
+	DataSource         string         `json:"data_source,omitempty"`
+	Company            CompanyProfile `json:"company"`
+	FetchedAt          time.Time      `json:"fetched_at"`
+}
+
+type CompanyProfile struct {
+	Code              string  `json:"code,omitempty"`
+	Name              string  `json:"name,omitempty"`
+	EnglishName       string  `json:"english_name,omitempty"`
+	FullEnglishName   string  `json:"full_english_name,omitempty"`
+	IndustryCode      string  `json:"industry_code,omitempty"`
+	IndustryName      string  `json:"industry_name,omitempty"`
+	Description       string  `json:"description,omitempty"`
+	EstablishYear     int     `json:"establish_year,omitempty"`
+	ListDate          string  `json:"list_date,omitempty"`
+	CEO               string  `json:"ceo,omitempty"`
+	HomepageURL       string  `json:"homepage_url,omitempty"`
+	LogoImageURL      string  `json:"logo_image_url,omitempty"`
+	SharesOutstanding int64   `json:"shares_outstanding,omitempty"`
+	MarketValue       float64 `json:"market_value,omitempty"`
+	MarketValueKrw    float64 `json:"market_value_krw,omitempty"`
+	Currency          string  `json:"currency,omitempty"`
+}
