@@ -1,0 +1,29 @@
+{
+  "result": {
+    "type": "US_NORMAL",
+    "market": {"code": "NSQ", "displayName": "NASDAQ"},
+    "company": {
+      "code": "NAS116LTR-E0",
+      "name": "샌디스크",
+      "englishName": "SANDISK CORP",
+      "fullEnglishName": "SANDISK CORP",
+      "industry": {"code": "252030", "displayName": "하드웨어및주변장치"},
+      "description": "SD카드, USB 플래시 드라이브 등의 메모리 제품을 판매하는 회사",
+      "establishYear": 2024,
+      "listDate": "2025-02-24",
+      "ceo": "David V. Goeckeler",
+      "homepageUrl": "http://www.sandisk.com",
+      "logoImageUrl": "https://static.toss.im/png-icons/securities/icn-sec-fill-SNDK.png",
+      "sharesOutstanding": 148089758,
+      "marketValue": 208510379264,
+      "marketValueKrw": 311055783786035,
+      "currency": "USD"
+    },
+    "marketValueKrw": 306146648589108,
+    "marketValue": 204766670182,
+    "enterpriseValueKrw": 151607171797266,
+    "enterpriseValue": 99820365945,
+    "dataSource": "출처: 연합인포맥스 및 기업 IR자료",
+    "listDate": "2025-02-24"
+  }
+}

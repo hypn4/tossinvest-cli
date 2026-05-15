@@ -104,6 +104,11 @@
       "file": "option-prices-bulk.json",
       "url": "https://wts-info-api.tossinvest.com/api/v2/stock-prices?codes=OPT_SNDK260515C01395000_20260506%2COPT_SNDK260515P01395000_20260506",
       "method": "GET"
+    },
+    {
+      "file": "stock-overview-sndk.json",
+      "url": "https://wts-info-api.tossinvest.com/api/v2/stock-infos/NAS0250224006/overview",
+      "method": "GET"
     }
   ]
 }
