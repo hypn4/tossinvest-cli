@@ -32,6 +32,7 @@ All notable changes to this project will be documented in this file.
 - `tossctl stock analyst <symbol>` — analyst BUY/HOLD/SELL counts + consensus target price + past close history + report list via `/api/v1/stock-detail/ui/wts/{code}/analyst-opinion` + `/api/v2/stock-infos/consensus/{code}` + `/api/v1/stock-detail/ui/wts/{code}/analyst-reports`.
 - `tossctl stock financials <symbol>` — financial snapshot (안정성 + 매출/순이익 시계열 + 영업이익 시계열) via `/api/v2/stock-infos/stability|revenue-and-net-profit|operating-income/{code}` (all POST `{}`).
 - `tossctl stock dividends <symbol> [--all-history]` — dividend snapshot (TTM yield card + recent-range payouts + optional full history) via `/api/v1/stock-infos/{code}/dividends/yield-ratio/histories` + `/api/v1/stock-infos/dividend/{code}/years` + `/api/v1/stock-infos/dividend/{code}/summary`. Non-paying stocks render `"No dividends recorded for this stock."`
+- `tossctl stock estimates <symbol>` — analyst forecast snapshot (next-earnings headline + revenue/EPS/operating-income time series with surprise %) via `/api/v2/companies/{code}/financial/estimate/{date,revenue,eps,operating-income}`. Stocks without analyst coverage for a metric render `(no analyst coverage)` for that section.
 
 ### Changed
 - `cmd/tossctl/chart.go`, `cmd/tossctl/quotes.go`, `cmd/tossctl/quote.go` long help text now documents that `--follow` is REST polling (no SSE/WebSocket from Toss) and that closed-market silence is correct behavior.

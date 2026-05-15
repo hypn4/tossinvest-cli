@@ -268,6 +268,37 @@ Examples:
 	}
 	dividendsCmd.Flags().BoolVar(&dividendsAllHistory, "all-history", false, "Include the full historical payout list in table/CSV output")
 
-	cmd.AddCommand(infoCmd, overviewCmd, indicatorsCmd, valuationCmd, revenueCmd, peersCmd, analystCmd, financialsCmd, dividendsCmd)
+	estimatesCmd := &cobra.Command{
+		Use:   "estimates <symbol>",
+		Short: "Analyst forecast snapshot (revenue + EPS + operating-income estimates vs actuals)",
+		Long: `Fetch analyst estimates from four endpoints:
+  - GET  /api/v2/companies/{code}/financial/estimate/date — next-earnings headline
+  - POST /api/v2/companies/{code}/financial/estimate/revenue (body {}) — revenue time series
+  - POST /api/v2/companies/{code}/financial/estimate/eps (body {}) — EPS time series
+  - POST /api/v2/companies/{code}/financial/estimate/operating-income (body {}) — OI time series
+
+Each time-series point pairs the actual value with the consensus estimate
+and the surprise % (actual / est − 1). When a stock has no analyst coverage
+for a metric (e.g. small-cap operating-income), the est fields are nil and
+the section prints "(no analyst coverage)".
+
+Examples:
+  tossctl stock estimates SNDK
+  tossctl stock estimates NAS0250224006 --output json`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			app, err := newAppContext(opts)
+			if err != nil {
+				return err
+			}
+			est, err := app.client.GetStockEstimates(cmd.Context(), args[0])
+			if err != nil {
+				return userFacingCommandError(err)
+			}
+			return output.WriteStockEstimates(cmd.OutOrStdout(), app.format, est)
+		},
+	}
+
+	cmd.AddCommand(infoCmd, overviewCmd, indicatorsCmd, valuationCmd, revenueCmd, peersCmd, analystCmd, financialsCmd, dividendsCmd, estimatesCmd)
 	return cmd
 }
