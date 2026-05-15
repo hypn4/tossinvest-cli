@@ -10,6 +10,31 @@ import (
 	"github.com/junghoonkye/tossinvest-cli/internal/domain"
 )
 
+func TestWriteCompanyOverviewTable(t *testing.T) {
+	ov := domain.CompanyOverview{
+		ProductCode:        "NAS0250224006",
+		Market:             "NASDAQ",
+		EnterpriseValueKrw: 151607171797266,
+		Company: domain.CompanyProfile{
+			Name:         "샌디스크",
+			EnglishName:  "SANDISK CORP",
+			CEO:          "David V. Goeckeler",
+			IndustryName: "하드웨어및주변장치",
+			Description:  "메모리 회사",
+		},
+	}
+	var buf bytes.Buffer
+	if err := WriteCompanyOverview(&buf, FormatTable, ov); err != nil {
+		t.Fatalf("error: %v", err)
+	}
+	s := buf.String()
+	for _, needle := range []string{"샌디스크", "SANDISK CORP", "David V. Goeckeler", "하드웨어"} {
+		if !strings.Contains(s, needle) {
+			t.Fatalf("missing %q in table output:\n%s", needle, s)
+		}
+	}
+}
+
 func TestWriteStockInfoDetailTable(t *testing.T) {
 	detail := domain.StockInfoDetail{
 		ProductCode: "NAS0250224006",
