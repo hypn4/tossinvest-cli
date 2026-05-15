@@ -211,3 +211,57 @@ func (c *Client) ListOptionExpiries(ctx context.Context, underlying string) ([]d
 	}
 	return out, nil
 }
+
+type optionPricesEnvelope struct {
+	Result struct {
+		Prices []struct {
+			Code            string  `json:"code"`
+			Base            float64 `json:"base"`
+			Close           float64 `json:"close"`
+			ChangeType      string  `json:"changeType"`
+			Currency        string  `json:"currency"`
+			Volume          float64 `json:"volume"`
+			BaseKrw         float64 `json:"baseKrw"`
+			CloseKrw        float64 `json:"closeKrw"`
+			BaseKrwDecimal  float64 `json:"baseKrwDecimal"`
+			CloseKrwDecimal float64 `json:"closeKrwDecimal"`
+		} `json:"prices"`
+	} `json:"result"`
+}
+
+// GetOptionPrices fetches the bulk price list for a slice of productCodes
+// (typically OPT_ codes but also works for stocks). The URL encodes codes as
+// a comma-separated `codes` parameter, matching what the chain UI sends.
+func (c *Client) GetOptionPrices(ctx context.Context, codes []string) ([]domain.OptionPrice, error) {
+	if len(codes) == 0 {
+		return nil, fmt.Errorf("GetOptionPrices: codes is empty")
+	}
+	endpoint, err := url.Parse(fmt.Sprintf("%s/api/v2/stock-prices", c.infoBaseURL))
+	if err != nil {
+		return nil, err
+	}
+	q := endpoint.Query()
+	q.Set("codes", strings.Join(codes, ","))
+	endpoint.RawQuery = q.Encode()
+
+	var env optionPricesEnvelope
+	if err := c.getJSON(ctx, endpoint.String(), &env); err != nil {
+		return nil, err
+	}
+	out := make([]domain.OptionPrice, 0, len(env.Result.Prices))
+	for _, p := range env.Result.Prices {
+		out = append(out, domain.OptionPrice{
+			Code:            p.Code,
+			Base:            p.Base,
+			Close:           p.Close,
+			ChangeType:      p.ChangeType,
+			Currency:        p.Currency,
+			Volume:          p.Volume,
+			BaseKrw:         p.BaseKrw,
+			CloseKrw:        p.CloseKrw,
+			BaseKrwDecimal:  p.BaseKrwDecimal,
+			CloseKrwDecimal: p.CloseKrwDecimal,
+		})
+	}
+	return out, nil
+}

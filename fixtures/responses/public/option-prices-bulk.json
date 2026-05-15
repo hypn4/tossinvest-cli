@@ -1,0 +1,8 @@
+{
+  "result": {
+    "prices": [
+      {"code":"OPT_SNDK260515C01395000_20260506","base":31.8,"close":15.4,"changeType":"DOWN","currency":"USD","volume":462,"baseKrw":47439,"closeKrw":22974,"baseKrwDecimal":47439.24,"closeKrwDecimal":22974.92},
+      {"code":"OPT_SNDK260515P01395000_20260506","base":1.8,"close":4.2,"changeType":"UP","currency":"USD","volume":210,"baseKrw":2685,"closeKrw":6266,"baseKrwDecimal":2685.24,"closeKrwDecimal":6266.56}
+    ]
+  }
+}

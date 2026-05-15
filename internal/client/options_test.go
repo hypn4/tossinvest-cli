@@ -141,3 +141,36 @@ func TestGetNearestATMOptionFromFixture(t *testing.T) {
 		t.Fatalf("unexpected nearest ATM code: %s", code)
 	}
 }
+
+func TestGetOptionPricesFromFixture(t *testing.T) {
+	t.Parallel()
+	root := fixtureRoot(t)
+	body := mustReadFile(t, filepath.Join(root, "option-prices-bulk.json"))
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/v2/stock-prices" {
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+		got := r.URL.Query().Get("codes")
+		want := "OPT_SNDK260515C01395000_20260506,OPT_SNDK260515P01395000_20260506"
+		if got != want {
+			t.Fatalf("codes mismatch:\n got: %s\nwant: %s", got, want)
+		}
+		w.Write(body)
+	}))
+	defer server.Close()
+
+	c := New(Config{HTTPClient: server.Client(), InfoBaseURL: server.URL})
+	prices, err := c.GetOptionPrices(context.Background(), []string{
+		"OPT_SNDK260515C01395000_20260506",
+		"OPT_SNDK260515P01395000_20260506",
+	})
+	if err != nil {
+		t.Fatalf("GetOptionPrices error: %v", err)
+	}
+	if len(prices) != 2 {
+		t.Fatalf("expected 2 prices, got %d", len(prices))
+	}
+	if prices[0].Code != "OPT_SNDK260515C01395000_20260506" || prices[0].Close != 15.4 {
+		t.Fatalf("unexpected first price: %+v", prices[0])
+	}
+}
