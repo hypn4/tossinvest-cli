@@ -1,0 +1,7 @@
+{
+  "result": [
+    {"time":"21:09:40","code":"US20100311002","price":168.60,"priceKrw":251517,"base":186.19,"baseKrw":277758,"volume":2,"tradeType":"SELL","cumulativeVolume":1731781},
+    {"time":"21:09:39","code":"US20100311002","price":168.66,"priceKrw":251606,"base":186.19,"baseKrw":277758,"volume":1,"tradeType":"BUY","cumulativeVolume":1731779},
+    {"time":"21:09:38","code":"US20100311002","price":168.65,"priceKrw":251592,"base":186.19,"baseKrw":277758,"volume":10,"tradeType":"BUY","cumulativeVolume":1731778}
+  ]
+}

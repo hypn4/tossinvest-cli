@@ -24,6 +24,21 @@
     {
       "file": "chart-day-1.json",
       "url": "https://wts-info-api.tossinvest.com/api/v1/c-chart/kr-s/A005930/day:1?count=61&session=all&investMode=integrated&useAdjustedRate=true"
+    },
+    {
+      "file": "quotes-us-book.json",
+      "url": "https://wts-info-api.tossinvest.com/api/v3/stock-prices/US20100311002/quotes",
+      "method": "GET"
+    },
+    {
+      "file": "quotes-kr-book.json",
+      "url": "https://wts-info-api.tossinvest.com/api/v3/stock-prices/A005930/quotes",
+      "method": "GET"
+    },
+    {
+      "file": "ticks-us.json",
+      "url": "https://wts-info-api.tossinvest.com/api/v2/stock-prices/US20100311002/ticks?count=3",
+      "method": "GET"
     }
   ]
 }
