@@ -793,3 +793,34 @@ type EstimateOperatingIncomePoint struct {
 	OperatingIncomeEstKrw *float64 `json:"operating_income_est_krw"`
 	Surprise              *float64 `json:"surprise"`
 }
+
+// StockStatements is the pivoted view of a financial-statement-records call.
+// Periods are ordered oldest-first; line items follow the parent/child order
+// returned by the API.
+type StockStatements struct {
+	ProductCode string            `json:"product_code"`
+	Factor      StatementFactor   `json:"factor"`     // BAL|INC|CAS
+	Period      string            `json:"period"`     // Q|Y
+	IsKr        bool              `json:"is_kr"`
+	Periods     []StatementPeriod `json:"periods"`
+	FetchedAt   time.Time         `json:"fetched_at"`
+}
+
+type StatementFactor struct {
+	Code        string `json:"code"`
+	DisplayName string `json:"display_name"`
+}
+
+type StatementPeriod struct {
+	Period string              `json:"period"`
+	Items  []StatementLineItem `json:"items"`
+}
+
+type StatementLineItem struct {
+	Item       string   `json:"item"`                    // RTLR, SREV, etc
+	ParentItem string   `json:"parent_item,omitempty"`
+	NameKor    string   `json:"name_kor"`
+	NameEng    string   `json:"name_eng,omitempty"`
+	Unit       string   `json:"unit,omitempty"` // USD, KRW, etc
+	Value      *float64 `json:"value"`          // null when not reported
+}

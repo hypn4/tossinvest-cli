@@ -154,6 +154,11 @@
       "file": "stock-estimates-sndk.json",
       "url": "(combined estimate-date+revenue+eps+operating-income fixture for testing only)",
       "method": "GET+POST"
+    },
+    {
+      "file": "stock-statements-sndk-inc-q.json",
+      "url": "https://wts-info-api.tossinvest.com/api/v2/companies/NAS0250224006/financial-statement-records",
+      "method": "POST"
     }
   ]
 }

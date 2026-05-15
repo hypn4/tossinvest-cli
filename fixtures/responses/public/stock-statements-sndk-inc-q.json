@@ -1,0 +1,62 @@
+{
+  "result": {
+    "selectedFactor": {"code": "INC", "displayName": "손익계산서"},
+    "selectableFactors": [
+      {"code": "BAL", "displayName": "재무상태표"},
+      {"code": "INC", "displayName": "손익계산서"},
+      {"code": "CAS", "displayName": "현금흐름표"}
+    ],
+    "selectedPeriod": {"code": "Q", "displayName": "분기"},
+    "selectablePeriods": [
+      {"code": "Q", "displayName": "분기"},
+      {"code": "Y", "displayName": "연간"}
+    ],
+    "isKr": false,
+    "table": [
+      {
+        "period": "2025-06",
+        "value": [
+          {"item": "RTLR", "parentItem": null, "itemNameKor": "매출액", "itemNameEng": "Total Revenue", "unitType": "USD", "value": 1923.0},
+          {"item": "SREV", "parentItem": "RTLR", "itemNameKor": "매출", "itemNameEng": "Revenue", "unitType": "USD", "value": 1923.0},
+          {"item": "SCOR", "parentItem": null, "itemNameKor": "매출원가", "itemNameEng": "Cost of Revenue", "unitType": "USD", "value": 1432.0},
+          {"item": "SGRP", "parentItem": null, "itemNameKor": "매출총이익", "itemNameEng": "Gross Profit", "unitType": "USD", "value": 491.0},
+          {"item": "SOOE", "parentItem": null, "itemNameKor": "영업이익", "itemNameEng": "Operating Income", "unitType": "USD", "value": 18.0},
+          {"item": "TIAT", "parentItem": null, "itemNameKor": "당기순이익", "itemNameEng": "Net Income", "unitType": "USD", "value": 252.0}
+        ]
+      },
+      {
+        "period": "2025-09",
+        "value": [
+          {"item": "RTLR", "parentItem": null, "itemNameKor": "매출액", "itemNameEng": "Total Revenue", "unitType": "USD", "value": 2308.0},
+          {"item": "SREV", "parentItem": "RTLR", "itemNameKor": "매출", "itemNameEng": "Revenue", "unitType": "USD", "value": 2308.0},
+          {"item": "SCOR", "parentItem": null, "itemNameKor": "매출원가", "itemNameEng": "Cost of Revenue", "unitType": "USD", "value": 1542.0},
+          {"item": "SGRP", "parentItem": null, "itemNameKor": "매출총이익", "itemNameEng": "Gross Profit", "unitType": "USD", "value": 766.0},
+          {"item": "SOOE", "parentItem": null, "itemNameKor": "영업이익", "itemNameEng": "Operating Income", "unitType": "USD", "value": 879.0},
+          {"item": "TIAT", "parentItem": null, "itemNameKor": "당기순이익", "itemNameEng": "Net Income", "unitType": "USD", "value": 803.0}
+        ]
+      },
+      {
+        "period": "2025-12",
+        "value": [
+          {"item": "RTLR", "parentItem": null, "itemNameKor": "매출액", "itemNameEng": "Total Revenue", "unitType": "USD", "value": 2306.0},
+          {"item": "SREV", "parentItem": "RTLR", "itemNameKor": "매출", "itemNameEng": "Revenue", "unitType": "USD", "value": 2306.0},
+          {"item": "SCOR", "parentItem": null, "itemNameKor": "매출원가", "itemNameEng": "Cost of Revenue", "unitType": "USD", "value": 1239.0},
+          {"item": "SGRP", "parentItem": null, "itemNameKor": "매출총이익", "itemNameEng": "Gross Profit", "unitType": "USD", "value": 1067.0},
+          {"item": "SOOE", "parentItem": null, "itemNameKor": "영업이익", "itemNameEng": "Operating Income", "unitType": "USD", "value": 1067.0},
+          {"item": "TIAT", "parentItem": null, "itemNameKor": "당기순이익", "itemNameEng": "Net Income", "unitType": "USD", "value": 887.0}
+        ]
+      },
+      {
+        "period": "2026-03",
+        "value": [
+          {"item": "RTLR", "parentItem": null, "itemNameKor": "매출액", "itemNameEng": "Total Revenue", "unitType": "USD", "value": 3092.0},
+          {"item": "SREV", "parentItem": "RTLR", "itemNameKor": "매출", "itemNameEng": "Revenue", "unitType": "USD", "value": 3092.0},
+          {"item": "SCOR", "parentItem": null, "itemNameKor": "매출원가", "itemNameEng": "Cost of Revenue", "unitType": "USD", "value": 1581.0},
+          {"item": "SGRP", "parentItem": null, "itemNameKor": "매출총이익", "itemNameEng": "Gross Profit", "unitType": "USD", "value": 1511.0},
+          {"item": "SOOE", "parentItem": null, "itemNameKor": "영업이익", "itemNameEng": "Operating Income", "unitType": "USD", "value": 4111.0},
+          {"item": "TIAT", "parentItem": null, "itemNameKor": "당기순이익", "itemNameEng": "Net Income", "unitType": "USD", "value": 3615.0}
+        ]
+      }
+    ]
+  }
+}
