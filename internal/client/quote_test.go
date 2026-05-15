@@ -14,6 +14,15 @@ func TestGetQuoteFromFixtures(t *testing.T) {
 	t.Parallel()
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// New code-path endpoints are tried first; if a fixture is not yet
+		// available we return 404 so GetQuote falls back to the legacy
+		// /api/v1/product/stock-prices path the original fixtures still cover.
+		switch r.URL.Path {
+		case "/api/v3/stock-prices/details",
+			"/api/v1/stock-infos/header/A005930":
+			http.NotFound(w, r)
+			return
+		}
 		fixturePath := fixturePathForRequest(t, r.URL.Path)
 		http.ServeFile(w, r, fixturePath)
 	}))
@@ -63,6 +72,9 @@ func TestGetQuoteResolvesUSSymbolViaSearch(t *testing.T) {
 			_, _ = w.Write([]byte(`{"result":{"stocks":[{"stockCode":"US20220809012","stockName":"TSLL","matchType":"EXACT"}]}}`))
 		case r.URL.Path == "/api/v2/stock-infos/US20220809012":
 			_, _ = w.Write([]byte(`{"result":{"symbol":"TSLL","name":"TSLL","currency":"USD","status":"N","market":{"code":"NSQ","displayName":"NASDAQ"}}}`))
+		case r.URL.Path == "/api/v3/stock-prices/details",
+			r.URL.Path == "/api/v1/stock-infos/header/US20220809012":
+			http.NotFound(w, r)
 		case r.URL.Path == "/api/v1/product/stock-prices":
 			_, _ = w.Write([]byte(`{"result":[{"productCode":"US20220809012","currency":"USD","base":14.38,"close":15.36,"volume":13409779}]}`))
 		case r.URL.Path == "/api/v1/stock-detail/ui/US20220809012/common":

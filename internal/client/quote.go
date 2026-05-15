@@ -40,6 +40,51 @@ type stockPriceResult struct {
 	Volume      float64 `json:"volume"`
 }
 
+type stockPriceDetailsResult struct {
+	Code             string  `json:"code"`
+	Exchange         string  `json:"exchange"`
+	Currency         string  `json:"currency"`
+	TradeDateTime    string  `json:"tradeDateTime"`
+	Open             float64 `json:"open"`
+	High             float64 `json:"high"`
+	Low              float64 `json:"low"`
+	Close            float64 `json:"close"`
+	Volume           float64 `json:"volume"`
+	Value            float64 `json:"value"`
+	Base             float64 `json:"base"`
+	High52W          float64 `json:"high52w"`
+	Low52W           float64 `json:"low52w"`
+	High1Y           float64 `json:"high1y"`
+	Low1Y            float64 `json:"low1y"`
+	MarketCap        float64 `json:"marketCap"`
+	TradingStrength  float64 `json:"tradingStrength"`
+	PreDayVolume     float64 `json:"preDayVolume"`
+	UpperLimit       float64 `json:"upperLimit"`
+	LowerLimit       float64 `json:"lowerLimit"`
+	AfterMarketOpen  float64 `json:"afterMarketOpen"`
+	AfterMarketHigh  float64 `json:"afterMarketHigh"`
+	AfterMarketLow   float64 `json:"afterMarketLow"`
+	AfterMarketClose float64 `json:"afterMarketClose"`
+	CloseKRW         float64 `json:"closeKrw"`
+	OpenKRW          float64 `json:"openKrw"`
+	HighKRW          float64 `json:"highKrw"`
+	LowKRW           float64 `json:"lowKrw"`
+	BaseKRW          float64 `json:"baseKrw"`
+	ValueKRW         float64 `json:"valueKrw"`
+}
+
+type stockHeaderSection struct {
+	Type               string  `json:"type"`
+	GrossExpenseRatio  float64 `json:"grossExpenseRatio,omitempty"`
+	DividendYieldRatio float64 `json:"dividendYieldRatio,omitempty"`
+	Ranking            int     `json:"ranking,omitempty"`
+	TradingStrength    float64 `json:"tradingStrength,omitempty"`
+}
+
+type stockHeaderResult struct {
+	Sections []stockHeaderSection `json:"sections"`
+}
+
 type stockSearchEnvelope struct {
 	Result struct {
 		Stocks []struct {
@@ -61,41 +106,135 @@ func (c *Client) GetQuote(ctx context.Context, symbol string) (domain.Quote, err
 		return domain.Quote{}, err
 	}
 
-	price, err := c.getStockPrice(ctx, productCode)
-	if err != nil {
-		return domain.Quote{}, err
-	}
-
-	detail, err := c.getStockDetailCommon(ctx, productCode)
-	if err != nil {
-		detail = nil
-	}
-
 	quote := domain.Quote{
-		ProductCode:    price.ProductCode,
-		Symbol:         info.Symbol,
-		Name:           info.Name,
-		MarketCode:     info.Market.Code,
-		Market:         info.Market.DisplayName,
-		Currency:       firstNonEmpty(price.Currency, info.Currency),
-		ReferencePrice: price.Base,
-		Last:           price.Close,
-		Change:         price.Close - price.Base,
-		Volume:         price.Volume,
-		Status:         info.Status,
-		FetchedAt:      time.Now().UTC(),
+		ProductCode: productCode,
+		Symbol:      info.Symbol,
+		Name:        info.Name,
+		MarketCode:  info.Market.Code,
+		Market:      info.Market.DisplayName,
+		Currency:    info.Currency,
+		Status:      info.Status,
+		FetchedAt:   time.Now().UTC(),
 	}
 
-	if price.Base != 0 {
-		quote.ChangeRate = quote.Change / price.Base
+	if details, err := c.getStockPriceDetails(ctx, productCode); err == nil {
+		applyPriceDetails(&quote, details)
+	} else {
+		price, err := c.getStockPrice(ctx, productCode)
+		if err != nil {
+			return domain.Quote{}, err
+		}
+		applyPriceFallback(&quote, price)
 	}
 
-	if detail != nil {
+	if header, err := c.getStockHeader(ctx, productCode); err == nil {
+		applyStockHeader(&quote, header)
+	}
+
+	if detail, err := c.getStockDetailCommon(ctx, productCode); err == nil && detail != nil {
 		quote.BadgeCount = len(detail.Badges)
 		quote.NoticeCount = len(detail.Notices)
 	}
 
 	return quote, nil
+}
+
+func applyPriceDetails(q *domain.Quote, d stockPriceDetailsResult) {
+	q.Currency = firstNonEmpty(d.Currency, q.Currency)
+	q.ReferencePrice = d.Base
+	q.Last = d.Close
+	q.Change = d.Close - d.Base
+	q.Volume = d.Volume
+	q.Open = d.Open
+	q.High = d.High
+	q.Low = d.Low
+	q.Value = d.Value
+	q.High52W = d.High52W
+	q.Low52W = d.Low52W
+	q.High1Y = d.High1Y
+	q.Low1Y = d.Low1Y
+	q.MarketCap = d.MarketCap
+	q.TradingStrength = d.TradingStrength
+	q.PreDayVolume = d.PreDayVolume
+	q.UpperLimit = d.UpperLimit
+	q.LowerLimit = d.LowerLimit
+	q.AfterMarketOpen = d.AfterMarketOpen
+	q.AfterMarketHigh = d.AfterMarketHigh
+	q.AfterMarketLow = d.AfterMarketLow
+	q.AfterMarketClose = d.AfterMarketClose
+	q.LastKRW = d.CloseKRW
+	q.OpenKRW = d.OpenKRW
+	q.HighKRW = d.HighKRW
+	q.LowKRW = d.LowKRW
+	q.ReferencePriceKRW = d.BaseKRW
+	q.ValueKRW = d.ValueKRW
+
+	if d.Base != 0 {
+		q.ChangeRate = q.Change / d.Base
+	}
+}
+
+func applyPriceFallback(q *domain.Quote, p stockPriceResult) {
+	q.Currency = firstNonEmpty(p.Currency, q.Currency)
+	q.ReferencePrice = p.Base
+	q.Last = p.Close
+	q.Change = p.Close - p.Base
+	q.Volume = p.Volume
+	if p.Base != 0 {
+		q.ChangeRate = q.Change / p.Base
+	}
+}
+
+func applyStockHeader(q *domain.Quote, header stockHeaderResult) {
+	for _, section := range header.Sections {
+		switch strings.ToUpper(section.Type) {
+		case "ETF":
+			q.GrossExpenseRatio = section.GrossExpenseRatio
+			q.DividendYieldRate = section.DividendYieldRatio
+		case "TRADING_AMOUNT":
+			q.TradingAmountRank = section.Ranking
+		case "TRADING_STRENGTH":
+			if section.TradingStrength != 0 && q.TradingStrength == 0 {
+				q.TradingStrength = section.TradingStrength
+			}
+		}
+	}
+	if q.MarketCap > 0 && q.MarketCapKRW == 0 {
+		// Server response sometimes omits MarketCapKRW; downstream KRW columns are
+		// best-effort. Leave zero rather than recomputing here.
+		q.MarketCapKRW = 0
+	}
+}
+
+func (c *Client) getStockPriceDetails(ctx context.Context, productCode string) (stockPriceDetailsResult, error) {
+	endpoint, err := url.Parse(fmt.Sprintf("%s/api/v3/stock-prices/details", c.infoBaseURL))
+	if err != nil {
+		return stockPriceDetailsResult{}, err
+	}
+	query := endpoint.Query()
+	query.Set("productCodes", productCode)
+	endpoint.RawQuery = query.Encode()
+
+	var envelope quoteEnvelope[[]stockPriceDetailsResult]
+	if err := c.getJSON(ctx, endpoint.String(), &envelope); err != nil {
+		return stockPriceDetailsResult{}, err
+	}
+	if len(envelope.Result) == 0 {
+		return stockPriceDetailsResult{}, fmt.Errorf("no price-details result for %s", productCode)
+	}
+	return envelope.Result[0], nil
+}
+
+func (c *Client) getStockHeader(ctx context.Context, productCode string) (stockHeaderResult, error) {
+	var envelope quoteEnvelope[stockHeaderResult]
+	if err := c.getJSON(
+		ctx,
+		fmt.Sprintf("%s/api/v1/stock-infos/header/%s", c.infoBaseURL, productCode),
+		&envelope,
+	); err != nil {
+		return stockHeaderResult{}, err
+	}
+	return envelope.Result, nil
 }
 
 func (c *Client) resolveProductCode(ctx context.Context, symbol string) (string, error) {
