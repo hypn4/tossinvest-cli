@@ -10,11 +10,12 @@ import (
 
 func TestPostJSONEmptySendsEmptyBody(t *testing.T) {
 	t.Parallel()
-	var gotMethod, gotCT string
+	var gotMethod, gotCT, gotUA string
 	var gotBody []byte
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		gotMethod = r.Method
 		gotCT = r.Header.Get("Content-Type")
+		gotUA = r.Header.Get("User-Agent")
 		gotBody, _ = io.ReadAll(r.Body)
 		w.Write([]byte(`{"result":{"ok":true}}`))
 	}))
@@ -34,6 +35,9 @@ func TestPostJSONEmptySendsEmptyBody(t *testing.T) {
 	}
 	if gotCT != "application/json" {
 		t.Fatalf("expected Content-Type application/json, got %q", gotCT)
+	}
+	if gotUA != DefaultBrowserUserAgent {
+		t.Fatalf("expected User-Agent %q, got %q", DefaultBrowserUserAgent, gotUA)
 	}
 	if string(gotBody) != "{}" {
 		t.Fatalf("expected body {}, got %q", string(gotBody))

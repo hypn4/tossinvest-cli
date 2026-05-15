@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 )
@@ -17,6 +16,7 @@ func (c *Client) postJSONEmpty(ctx context.Context, endpoint string, dst any) er
 	if err != nil {
 		return err
 	}
+	c.applySession(req)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("User-Agent", DefaultBrowserUserAgent)
 	resp, err := c.httpClient.Do(req)
@@ -26,7 +26,7 @@ func (c *Client) postJSONEmpty(ctx context.Context, endpoint string, dst any) er
 	defer resp.Body.Close()
 	if resp.StatusCode/100 != 2 {
 		body, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("POST %s: %s — %s", endpoint, resp.Status, string(body))
+		return newStatusError(resp.StatusCode, endpoint, body)
 	}
 	return json.NewDecoder(resp.Body).Decode(dst)
 }
