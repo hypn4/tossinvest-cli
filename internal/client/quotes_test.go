@@ -91,3 +91,40 @@ func TestGetOrderBookKR(t *testing.T) {
 		t.Fatalf("expected KRW currency, got %s", book.Currency)
 	}
 }
+
+func TestGetTicks(t *testing.T) {
+	t.Parallel()
+
+	root := fixtureRoot(t)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.URL.Path == "/api/v2/stock-infos/US20100311002":
+			http.ServeFile(w, r, filepath.Join(root, "stock-info.json"))
+		case r.URL.Path == "/api/v2/stock-prices/US20100311002/ticks":
+			if r.URL.Query().Get("count") != "3" {
+				t.Fatalf("expected count=3 query param, got %q", r.URL.RawQuery)
+			}
+			http.ServeFile(w, r, filepath.Join(root, "ticks-us.json"))
+		default:
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+	}))
+	defer server.Close()
+
+	c := New(Config{HTTPClient: server.Client(), InfoBaseURL: server.URL})
+	ticks, err := c.GetTicks(context.Background(), "US20100311002", 3)
+	if err != nil {
+		t.Fatalf("GetTicks returned error: %v", err)
+	}
+	if len(ticks) != 3 {
+		t.Fatalf("expected 3 ticks, got %d", len(ticks))
+	}
+	// Source order is newest-first; our client must preserve order so callers can
+	// dedup deterministically with cumulativeVolume.
+	if ticks[0].CumulativeVolume != 1731781 || ticks[2].CumulativeVolume != 1731778 {
+		t.Fatalf("unexpected order: %+v", ticks)
+	}
+	if ticks[0].TradeType != "SELL" || ticks[1].TradeType != "BUY" {
+		t.Fatalf("trade type decoding broken: %+v", ticks[:2])
+	}
+}
