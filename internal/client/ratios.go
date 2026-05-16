@@ -2,7 +2,9 @@ package client
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/junghoonkye/tossinvest-cli/internal/domain"
@@ -33,20 +35,40 @@ type ratiosEnvelope struct {
 	} `json:"result"`
 }
 
-// GetStockRatios fetches the financial-statements/comprehensive payload —
-// the time series for the default factor (DEBT_RATIO) and its component
-// line items, across the default range (3년) and period (Q). Toss's server
-// supports other factor/range/period selections via body, but PR14 ships
-// only the default case; future PRs may add --factor / --period flags
-// after fresh captures verify those variants.
-func (c *Client) GetStockRatios(ctx context.Context, symbol string) (domain.StockRatios, error) {
+// GetStockRatios fetches the financial-statements/comprehensive endpoint for
+// a selected factor + period. The Toss API accepts a JSON body
+// {factorCode, period} and returns 3 line items (two components + the
+// derived ratio) across N periods (3-year default; the 1년/3년/5년/전체
+// range is server-controlled and not exposed via this call).
+//
+// Validated factor codes: DEBT_RATIO, CURRENT_RATIO, INTEREST_COVERAGE_RATIO.
+// Validated periods: Q (quarterly), Y (annual). Inputs are case-insensitive;
+// they are normalized to uppercase before the wire call.
+func (c *Client) GetStockRatios(ctx context.Context, symbol, factorCode, period string) (domain.StockRatios, error) {
+	factorCode = strings.ToUpper(factorCode)
+	switch factorCode {
+	case "DEBT_RATIO", "CURRENT_RATIO", "INTEREST_COVERAGE_RATIO":
+	default:
+		return domain.StockRatios{}, fmt.Errorf("GetStockRatios: factorCode must be one of DEBT_RATIO|CURRENT_RATIO|INTEREST_COVERAGE_RATIO (got %q)", factorCode)
+	}
+	period = strings.ToUpper(period)
+	if period != "Q" && period != "Y" {
+		return domain.StockRatios{}, fmt.Errorf("GetStockRatios: period must be Q or Y (got %q)", period)
+	}
+
 	productCode, err := c.resolveProductCode(ctx, symbol)
 	if err != nil {
 		return domain.StockRatios{}, err
 	}
 	endpoint := fmt.Sprintf("%s/api/v2/companies/%s/financial-statements/comprehensive", c.infoBaseURL, productCode)
+
+	bodyBytes, err := json.Marshal(map[string]string{"factorCode": factorCode, "period": period})
+	if err != nil {
+		return domain.StockRatios{}, err
+	}
+
 	var env ratiosEnvelope
-	if err := c.postJSONEmpty(ctx, endpoint, &env); err != nil {
+	if err := c.postJSON(ctx, endpoint, json.RawMessage(bodyBytes), &env); err != nil {
 		return domain.StockRatios{}, err
 	}
 

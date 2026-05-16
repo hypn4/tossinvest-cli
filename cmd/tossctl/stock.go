@@ -339,36 +339,43 @@ Examples:
 	statementsCmd.Flags().StringVar(&statementsFactor, "type", "INC", "Statement type: BAL (balance sheet), INC (income statement), CAS (cash flow)")
 	statementsCmd.Flags().StringVar(&statementsPeriod, "period", "Q", "Period granularity: Q (quarterly) or Y (annual)")
 
+	var ratiosFactor, ratiosPeriod string
 	ratiosCmd := &cobra.Command{
 		Use:   "ratios <symbol>",
-		Short: "Debt-ratio time series with components (총자본 + 총부채 + 부채비율 across 12 quarters)",
-		Long: `Fetch the financial-statements/comprehensive endpoint (POST {}).
+		Short: "Solvency-ratio time series with components (debt / current / interest-coverage × Q|Y)",
+		Long: `Fetch the financial-statements/comprehensive endpoint (POST {factorCode, period}).
 
-Default response: DEBT_RATIO factor, 분기 (Q) period, 3년 range — 3 line items
-(총자본 + 총부채 + 부채비율) × 12 periods.
+Each factor returns 3 line items × N periods:
+  DEBT_RATIO               총자본 + 총부채 + 부채비율
+  CURRENT_RATIO            유동자산 + 유동부채 + 유동비율
+  INTEREST_COVERAGE_RATIO  영업이익 + 이자비용 + 이자보상비율
 
-Toss's server also supports CURRENT_RATIO and INTEREST_COVERAGE_RATIO via
-selector body, plus 연간 (Y) period and 1년/5년/전체 ranges. PR14 ships only
-the empty-body default; --factor/--period flags will be added in a future PR
-after fresh captures verify those variants.
+--factor selects the factor (default DEBT_RATIO).
+--period selects Q (quarterly, 12 points, default) or Y (annual, 3 points).
+
+The 1년 / 3년 / 5년 / 전체 range is server-controlled (3년 default) and not
+exposed via this call.
 
 Examples:
   tossctl stock ratios SNDK
-  tossctl stock ratios NAS0250224006 --output json
-  tossctl stock ratios SNDK --output csv`,
+  tossctl stock ratios SNDK --factor CURRENT_RATIO
+  tossctl stock ratios SNDK --factor INTEREST_COVERAGE_RATIO --period Y
+  tossctl stock ratios NAS0250224006 --output json`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			app, err := newAppContext(opts)
 			if err != nil {
 				return err
 			}
-			ra, err := app.client.GetStockRatios(cmd.Context(), args[0])
+			ra, err := app.client.GetStockRatios(cmd.Context(), args[0], ratiosFactor, ratiosPeriod)
 			if err != nil {
 				return userFacingCommandError(err)
 			}
 			return output.WriteStockRatios(cmd.OutOrStdout(), app.format, ra)
 		},
 	}
+	ratiosCmd.Flags().StringVar(&ratiosFactor, "factor", "DEBT_RATIO", "Factor: DEBT_RATIO, CURRENT_RATIO, or INTEREST_COVERAGE_RATIO")
+	ratiosCmd.Flags().StringVar(&ratiosPeriod, "period", "Q", "Period granularity: Q (quarterly) or Y (annual)")
 
 	cmd.AddCommand(infoCmd, overviewCmd, indicatorsCmd, valuationCmd, revenueCmd, peersCmd, analystCmd, financialsCmd, dividendsCmd, estimatesCmd, statementsCmd, ratiosCmd)
 	return cmd
