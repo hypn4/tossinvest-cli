@@ -35,6 +35,8 @@ All notable changes to this project will be documented in this file.
 - `tossctl stock estimates <symbol>` — analyst forecast snapshot (next-earnings headline + revenue/EPS/operating-income time series with surprise %) via `/api/v2/companies/{code}/financial/estimate/{date,revenue,eps,operating-income}`. Stocks without analyst coverage for a metric render `(no analyst coverage)` for that section.
 - `tossctl stock statements <symbol> [--type BAL|INC|CAS] [--period Q|Y]` — full financial-statement records (BS/IS/CF line items, pivoted by period) via POST `/api/v2/companies/{code}/financial-statement-records` with `{factorCode, period}` body. Default INC/Q. Closes the dense-endpoint gap deferred from PR10.
 - `tossctl stock ratios <symbol> [--factor DEBT_RATIO|CURRENT_RATIO|INTEREST_COVERAGE_RATIO] [--period Q|Y]` — solvency-ratio time series with components (e.g. 총자본 + 총부채 + 부채비율, or 유동자산 + 유동부채 + 유동비율) via POST `/api/v2/companies/{code}/financial-statements/comprehensive` with `{factorCode, period}` body. Default DEBT_RATIO/Q.
+- `tossctl stock news <symbol> [--count N]` — latest news for a stock (Korean, curated by Toss) via `GET /api/v2/news/companies/{companyCode}`. Auto-paginates 20/page.
+- `tossctl stock filings <symbol> [--count N]` — KR filings (DART disclosures + KIND announcements + 어닝콜 metadata for EARNINGS form) via `GET /api/v1/stock-detail/companies/{companyCode}/filings`. US stocks return empty.
 
 ### Changed
 - `cmd/tossctl/chart.go`, `cmd/tossctl/quotes.go`, `cmd/tossctl/quote.go` long help text now documents that `--follow` is REST polling (no SSE/WebSocket from Toss) and that closed-market silence is correct behavior.

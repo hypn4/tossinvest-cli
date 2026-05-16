@@ -377,6 +377,66 @@ Examples:
 	ratiosCmd.Flags().StringVar(&ratiosFactor, "factor", "DEBT_RATIO", "Factor: DEBT_RATIO, CURRENT_RATIO, or INTEREST_COVERAGE_RATIO")
 	ratiosCmd.Flags().StringVar(&ratiosPeriod, "period", "Q", "Period granularity: Q (quarterly) or Y (annual)")
 
-	cmd.AddCommand(infoCmd, overviewCmd, indicatorsCmd, valuationCmd, revenueCmd, peersCmd, analystCmd, financialsCmd, dividendsCmd, estimatesCmd, statementsCmd, ratiosCmd)
+	var newsCount int
+	newsCmd := &cobra.Command{
+		Use:   "news <symbol>",
+		Short: "Latest news for a stock (Korean, curated by Toss)",
+		Long: `Fetch the latest news items from /api/v2/news/companies/{companyCode}.
+
+Returns Korean-language news from Toss's curated press partners (아주경제,
+파이낸셜뉴스, 이데일리, Benzinga via translation, etc.). Works for both KR
+and US stocks. Page size is 20; --count controls total items returned.
+
+Examples:
+  tossctl stock news A005930
+  tossctl stock news SNDK --count 50
+  tossctl stock news AAPL --output json`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			app, err := newAppContext(opts)
+			if err != nil {
+				return err
+			}
+			items, err := app.client.ListStockNews(cmd.Context(), args[0], newsCount)
+			if err != nil {
+				return userFacingCommandError(err)
+			}
+			return output.WriteStockNews(cmd.OutOrStdout(), app.format, items)
+		},
+	}
+	newsCmd.Flags().IntVar(&newsCount, "count", 20, "Number of news items to return (max ~100; auto-paginates)")
+
+	var filingsCount int
+	filingsCmd := &cobra.Command{
+		Use:   "filings <symbol>",
+		Short: "KR filings (DART + KIND) for a stock; empty for US stocks",
+		Long: `Fetch the latest KR regulatory filings from
+/api/v1/stock-detail/companies/{companyCode}/filings.
+
+Includes DART disclosures (form=EARNINGS includes 어닝콜 metadata),
+KIND announcements (form=HTML, 파생상품시장 안내 etc.), and similar
+filings. US stocks return an empty list (no Korean filings); use 'stock
+news' for international press coverage.
+
+Examples:
+  tossctl stock filings A005930
+  tossctl stock filings 005930 --count 50
+  tossctl stock filings A005930 --output json`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			app, err := newAppContext(opts)
+			if err != nil {
+				return err
+			}
+			items, err := app.client.ListStockFilings(cmd.Context(), args[0], filingsCount)
+			if err != nil {
+				return userFacingCommandError(err)
+			}
+			return output.WriteStockFilings(cmd.OutOrStdout(), app.format, items)
+		},
+	}
+	filingsCmd.Flags().IntVar(&filingsCount, "count", 20, "Number of filings to return (auto-paginates)")
+
+	cmd.AddCommand(infoCmd, overviewCmd, indicatorsCmd, valuationCmd, revenueCmd, peersCmd, analystCmd, financialsCmd, dividendsCmd, estimatesCmd, statementsCmd, ratiosCmd, newsCmd, filingsCmd)
 	return cmd
 }
