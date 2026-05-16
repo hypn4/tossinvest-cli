@@ -164,6 +164,16 @@
       "file": "stock-ratios-sndk-debt-q.json",
       "url": "https://wts-info-api.tossinvest.com/api/v2/companies/NAS0250224006/financial-statements/comprehensive",
       "method": "POST"
+    },
+    {
+      "file": "stock-news-samsung.json",
+      "url": "https://wts-info-api.tossinvest.com/api/v2/news/companies/005930?size=20&orderBy=latest",
+      "method": "GET"
+    },
+    {
+      "file": "stock-filings-samsung.json",
+      "url": "https://wts-info-api.tossinvest.com/api/v1/stock-detail/companies/005930/filings?number=1&size=20",
+      "method": "GET"
     }
   ]
 }

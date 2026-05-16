@@ -851,3 +851,42 @@ type RatioValue struct {
 	Value    float64 `json:"value"`
 	ValueKrw float64 `json:"value_krw,omitempty"`
 }
+
+type NewsItem struct {
+	ID        string     `json:"id"`
+	Title     string     `json:"title"`
+	Summary   string     `json:"summary"`
+	ImageURLs []string   `json:"image_urls,omitempty"`
+	Source    NewsSource `json:"source"`
+	CreatedAt string     `json:"created_at"`
+	UpdatedAt string     `json:"updated_at,omitempty"`
+}
+
+type NewsSource struct {
+	Code         string `json:"code"`
+	Name         string `json:"name"`
+	LogoImageURL string `json:"logo_image_url,omitempty"`
+}
+
+// FilingItem is one row from the KR filings endpoint. EarningCall is set
+// only when form == "EARNINGS".
+type FilingItem struct {
+	ID          string       `json:"id"`
+	Title       string       `json:"title"`
+	Summary     string       `json:"summary,omitempty"`
+	CompanyCode string       `json:"company_code"`
+	StockCode   string       `json:"stock_code"`
+	Form        string       `json:"form"`     // HTML|EARNINGS|...
+	ReportID    string       `json:"report_id"`
+	EarningCall *EarningCall `json:"earning_call,omitempty"`
+	CreatedAt   string       `json:"created_at"`
+}
+
+type EarningCall struct {
+	Status      string `json:"status"`              // ENDED|UPCOMING|LIVE|...
+	LandingURL  string `json:"landing_url,omitempty"`
+	Title       string `json:"title,omitempty"`
+	ReportTitle string `json:"report_title,omitempty"`
+	LiveAt      string `json:"live_at,omitempty"`
+	ZonedLiveAt string `json:"zoned_live_at,omitempty"`
+}

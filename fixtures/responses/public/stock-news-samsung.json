@@ -1,0 +1,26 @@
+{
+  "result": {
+    "pagingParam": {"number": 2, "size": 20, "key": null},
+    "body": [
+      {
+        "id": "ajukyung_20260516170346151",
+        "title": "[종합] 고개 숙인 이재용 \"모두 제 탓\"...18일 노사 사후조정 재개",
+        "summary": "이 회장 사과 후 노사 사후조정 재개 합의",
+        "imageUrls": ["https://image.ajunews.com/content/image/2026/05/16/x.jpg"],
+        "source": {"code": "ajukyung", "name": "아주경제", "logoImageUrl": "https://static.tossinvest.com/assets/image/press/ajunews-full.png"},
+        "createdAt": "2026-05-16T17:13:25",
+        "updatedAt": "2026-05-16T17:13:25"
+      },
+      {
+        "id": "financial_202605161658440981",
+        "title": "삼성전자 노사 대화 재개...18일 중노위 사후조정 '분수령'",
+        "summary": "노사는 오는 18일 오전부터 세종시 중앙노동위원회에서 2차 사후조정 회의를 열 예정이다.",
+        "imageUrls": [],
+        "source": {"code": "financial", "name": "파이낸셜뉴스", "logoImageUrl": ""},
+        "createdAt": "2026-05-16T16:58:44",
+        "updatedAt": "2026-05-16T16:58:44"
+      }
+    ],
+    "lastPage": true
+  }
+}
