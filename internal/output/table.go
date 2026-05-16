@@ -137,6 +137,12 @@ func formatQty(v float64) string {
 }
 
 func formatWithCommas(n int64) string {
+	if n < 0 {
+		// Recurse on absolute value to avoid the leading minus interacting with
+		// the modular-3 comma logic. (math.MinInt64 overflow is not a concern
+		// for financial values, which are bounded well below 2^63.)
+		return "-" + formatWithCommas(-n)
+	}
 	s := fmt.Sprintf("%d", n)
 	if len(s) <= 3 {
 		return s
